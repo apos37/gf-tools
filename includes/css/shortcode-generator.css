@@ -1,0 +1,35 @@
+/* Shortcode Generator */
+
+#gfat-shortcode-generator-cont {
+    display: block;
+    float: left;
+    margin-bottom: 5px;
+}
+
+#gfat-shortcode-generator {
+    display: flex;
+}
+
+#gfat-shortcode-generator div {
+    margin-right: 5px;
+}
+
+#gfat-merge-tag {
+    max-width: 200px;
+}
+
+#gfat-condition {
+    max-width: 130px;
+}
+
+#gfat-value {
+    max-width: 200px;
+}
+
+#gfat-insert-shortcode {
+    height: 2.75rem;
+}
+
+.wp-editor-tabs {
+    margin-top: 1rem !important;
+}

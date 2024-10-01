@@ -1,0 +1,41 @@
+/* Quiz Panel Test */
+
+#gfadvtools_quiz_answers_panel {
+    flex-flow: column;
+    height: calc(100vh - 227px);
+    overflow-y: auto;
+}
+
+#gfadvtools_quiz_answers_body {
+    padding: 20px;
+}
+
+#gfadvtools_quiz_answers_body .gfat-quiz-answers {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+#gfadvtools_quiz_answers_body p {
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+#gfadvtools_quiz_answers_body ol {
+    list-style: none;
+    margin-left: 0;
+}
+
+#gfadvtools_quiz_answers_body ol li {
+    position: relative;
+    padding-left: 30px;
+}
+
+#gfadvtools_quiz_answers_body ol li .num {
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+#gfadvtools_quiz_answers_body .gfat-correct-answers {
+    background: yellow;
+}

@@ -1,0 +1,54 @@
+/* Password View Icon */
+
+.gform-settings-input__container {
+    position: relative;
+}
+
+.gfat-toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 2;
+}
+
+#gfat_api_timestamp {
+    margin: 10px;
+    display: inline-block !important;
+}
+
+#gfat_api_key,
+#gfat_api_timestamp {
+    display: none;
+}
+
+#gfat_api_key.showCopyAPI {
+    display: inline-block !important;
+}
+
+#gfat_api_timestamp code {
+    border-radius: 5px;
+    font-weight: bold;
+    padding: 5px 10px;
+    margin-left: 5px;
+}
+
+/* Text+ */
+
+.text-plus-row {
+    display: flex;
+}
+
+.text-plus-row input, .text-plus-row select {
+    margin-right: 10px;
+}
+
+.remove-row {
+    padding: 10px 20px !important;
+    height: 44px !important;
+}
+
+.fields_container .text-plus-row:first-child .remove-row {
+    visibility: hidden;
+}

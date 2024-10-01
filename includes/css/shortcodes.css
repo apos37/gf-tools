@@ -1,0 +1,47 @@
+/* Export Entries */
+
+#gfat-export-entries-count span {
+    display: block;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+#gfat-export-entries-cont ul {
+    list-style-type: none;
+}
+
+#gfat-export-entries-cont input[type=checkbox] {
+    background: #fff;
+    border: 1px solid #9da2e9;
+    border-radius: 3px;
+    height: 1.375rem;
+    margin: 0 0.75rem 3px 0;
+    transition: box-shadow .15s ease,background-color .15s ease;
+    width: 1.375rem;
+    vertical-align: middle;
+}
+
+#gfat-export-entries-cont .field-labels {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1.375rem;
+}
+
+#gfat-export-entries-cont .form-fields-selectall {
+    margin-bottom: 30px;
+}
+
+#gfat-export-entries-cont .date-fields {
+    margin-bottom: 2rem;
+}
+
+
+#gfat-export-entries-cont .date-cont {
+    margin-right: 10px;
+    display: inline-block;
+}
+
+#gfat-export-entries-cont .field-dates {
+    padding: 7px;
+    display: block;
+}

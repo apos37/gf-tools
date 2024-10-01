@@ -1,0 +1,159 @@
+/* Top section */
+
+.gfat-report-top {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+    align-content: start;
+}
+
+.gfat-report .gfat-button {
+    background: #3E7DA6;
+    padding: 13px;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.gfat-report .gfat-button:hover {
+    background: #F15A2B;
+}
+
+.gfat-report input:not([type="submit"]) {
+    border-radius: 5px;
+    border: 1px solid #333;
+}
+
+#gfat-search-form input[type="text"] {
+    padding: 10px;
+    width: 250px;
+}
+
+#gfat-date-filter-form input[type="date"] {
+    padding: 8px;
+}
+
+#gfat-date-filter-form div {
+    margin-left: 5px;
+}
+
+.gfat-date-filter #quarter-links {
+    text-align: right;
+    margin-bottom: 10px;
+}
+
+.gfat-date-filter .quarter-links.gfat-button {
+    padding: 5px 10px;
+}
+
+.gfat-date-filter .quarter-links.gfat-button.current {
+    background: #F15A2B;
+}
+
+#gfat-date-filter-form .date-fields {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+    align-content: start;
+}
+
+/* Table info */
+
+.gfat-report-table-info {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+    align-content: start;
+    margin: 3rem 0 1rem 0;
+}
+
+/* Table */
+
+.gfat-report-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.gfat-report-table thead {
+    background-color: #F15A2B;
+    color: white;
+}
+
+.gfat-report-table th,
+.gfat-report-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.gfat-report-table th {
+    font-weight: bold;
+    min-width: 100px;
+}
+
+.gfat-report-table tbody tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.gfat-report-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.gfat-report-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.gfat-report-table tbody td {
+    vertical-align: middle;
+}
+
+.gfat-report-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.gfat-report-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.gfat-report-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.gfat-report-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+/* Bottom */
+
+.gfat-report-bottom {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: start;
+    align-content: start;
+    margin: 3rem 0 1rem 0;
+}
+
+#gfat-per-page {
+    padding: 10px;
+    border-radius: 5px;
+    margin-left: 5px;
+    min-width: 70px;
+    border: 1px solid #333;
+}
+
+.gfat-report-bottom .pagination .gfat-button.current {
+    background: #F15A2B;
+}

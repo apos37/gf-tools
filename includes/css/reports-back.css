@@ -1,0 +1,165 @@
+/* Containers */
+
+#gfat_fields_page.postbox,
+#gfat_preview.postbox {
+    background: #C1D6E6 !important;
+}
+
+#gfat_fields_export.postbox {
+    background: #ddd !important;
+}
+
+/* Sections */
+
+.gfat-form-section:not([data-form-id="0"]) {
+    margin-top: 1rem;
+}
+
+/* Form Fields */
+
+#gfat_settings .gfat-select-cont label,
+#gfat_settings .gfat-text-cont label  {
+    display: block;
+}
+
+.gfat-checkbox-cont label {
+    vertical-align: revert;
+}
+
+.gfat-row {
+    display: flex;
+}
+
+.gfat-row:not(:last-of-type) {
+    margin-bottom: 10px;
+}
+
+.gfat-row select {
+    min-width: 300px;
+}
+.gfat-row input[type="text"],
+.gfat-row input[type="number"] {
+    min-width: 300px;
+}
+
+.gfat-select-cont {
+    margin-right: 20px;
+}
+
+.gfat-form-cont {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.gfat-field-cont {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: background-color 0.3s;
+    position: relative;
+}
+
+.gfat-field-cont input[type="checkbox"] {
+    display: none;
+}
+
+.gfat-field-cont label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+    padding-right: 25px;
+    position: relative;
+}
+
+.gfat-field-cont input[type="checkbox"]:checked + label::after {
+    content: '\2713'; /* Unicode checkmark character */
+    position: absolute;
+    right: 10px;
+    color: #fff;
+    font-size: 18px;
+}
+
+.gfat-field-cont.highlighted {
+    background-color: #F15A2B;
+    color: #fff;
+    font-weight: 500;
+}
+
+.gfat-field-cont label::after {
+    content: '';
+}
+
+.gfat-edit-label {
+    display: none;
+}
+
+.highlighted .gfat-edit-label {
+    display: inline;
+    color: white;
+    opacity: 0.8;
+    font-weight: normal;
+    margin-left: 10px;
+}
+
+.highlighted .gfat-edit-label:hover {
+    color: white;
+    opacity: 1;
+}
+
+.highlighted .gfat-edit-label:focus {
+    box-shadow: none !important;
+}
+
+.gfat-field-cont .edit-input {
+    width: 100%;
+}
+
+/* Code Blocks */
+
+#gfat_shortcode code.shortcode {
+    font-size: 1rem;
+}
+
+#gfat_shortcode .code-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    position: relative;
+    margin: 10px 0;
+}
+
+#gfat_shortcode .code-box pre {
+    margin: 0;
+    overflow-x: auto;
+    /* white-space: pre-wrap; */
+}
+
+#gfat_shortcode .code-box .copy-button {
+    margin-top: 1rem;
+    padding: 5px 10px;
+    background-color: #0073aa;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#gfat_shortcode .code-box .copy-button:hover {
+    background-color: #005177;
+}
+
+/* Info Box */
+
+.gfat-info-box {
+    padding: 20px;
+    background: #FEF1E9;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}

@@ -1,0 +1,583 @@
+/* Title */
+
+.wrap h2.gf_admin_page_title {
+    background: #3E7DA6;
+    margin-left: -22px !important;
+    margin-right: -20px !important;
+    margin-top: -10px !important;
+    padding: 23px !important;
+    color: white;
+    font-size: 1.73rem !important;
+}
+
+/* Container */
+
+#gfat-tabs-container {
+    display: flex;
+}
+
+/* Sidebar */
+
+#gfat-tabs-sidebar {
+    width: 200px;
+    padding-right: 10px;
+    margin-top: 20px;
+}
+
+#gfat-tabs-sidebar .nav-tab-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    margin-left: -7px;
+    margin-bottom: 3rem;
+}
+
+#gfat-tabs-sidebar .nav-tab-list .nav-tab {
+    display: block;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-right: none;
+    border-bottom: none;
+    background: #f9f9f9;
+    cursor: pointer;
+    margin-bottom: 0;
+    width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    white-space: normal;
+    float: none;
+}
+
+#gfat-tabs-sidebar .nav-tab-list .nav-tab a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+    width: calc(100% - 20px);
+    line-height: 1.5;
+    padding: 8px;
+    border: 2px solid transparent;
+}
+
+#gfat-tabs-sidebar .nav-tab-list .nav-tab:hover {
+    background: #e9e9e9;
+}
+
+#gfat-tabs-sidebar .nav-tab-list .nav-tab-active {
+    background: #fff;
+    border-color: #ddd;
+    font-weight: bold;
+}
+
+#gfat-tabs-sidebar .nav-tab-list .nav-tab a:focus, 
+#gfat-tabs-sidebar .nav-tab-list .nav-tab a:active {
+    border: 2px solid #3E7DA6;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Content */
+
+#gfat-tab-content {
+    flex: 1;
+    padding: 20px;
+}
+
+#gfat-tab-content .tab-panel {
+    padding-top: 45px;           
+    background: #fff;
+    border: 1px solid #e3e6ef;
+    border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(18, 25, 97, .0779552);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    grid-column: span 2;
+    position: relative;
+}
+
+#gfat-tab-content .tab-content {
+    padding: 15px;
+    border-top: 1px solid #ebebf2;
+}
+
+#gfat-tab-content .page-title {
+    box-sizing: border-box;
+    display: block;
+    font-size: .875rem;
+    line-height: 2.875rem;
+    padding-left: 15px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    flex-grow: 1;
+    font-weight: 500;
+    margin: 0;
+    height: 45px;
+}
+
+#gfat-tab-content h3 {
+    font-size: 1.1em;
+}
+
+#gfat-tab-content h4 {
+    font-size: 1.1em;
+}
+
+/* Forms */
+
+#gfat-tab-content label {
+    font-size: .8125rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+    display: block;
+}
+
+#gfat-tab-content label[for=per_page] {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+#gfat-tab-content input[type=email], 
+#gfat-tab-content input[type=number], 
+#gfat-tab-content input[type=search], 
+#gfat-tab-content input[type=date], 
+#gfat-tab-content input[type=text]:not(#current-page-selector), 
+#gfat-tab-content input[type=url], 
+#gfat-tab-content select, 
+#gfat-tab-content textarea {
+    background-color: #fff;
+    border: 1px solid #9092b2;
+    border-radius: 3px;
+    color: #242748;
+    font-family: inherit;
+    font-size: .875rem;
+    line-height: 1.25rem;
+    padding: .6875rem 1rem;
+    transition: box-shadow .15s ease, background-color .15s ease;
+    min-width: 70px;
+    height: revert;
+}
+
+#gfat-tab-content .import-export-link {
+    margin-left: 1rem;
+}
+
+#gfat-tab-content #current-page-selector {
+    padding: 0 !important;
+    height: 37px;
+}
+
+#gfat-tab-content select {
+    height: revert !important;
+}
+
+#gfat-forms-filter {
+    margin: -3px 10px 0 10px;
+}
+
+.search-field #gfat-forms-filter {
+    margin-left: 0;
+}
+
+#gfat-tab-content input[type=submit] {
+    height: 44px !important;
+    padding: 0 20px;
+}
+
+#gfat-tab-content select {
+    width: auto;
+    padding-right: 2rem;
+}
+
+#gfat-tab-content #per_page {
+    padding: 0 10px !important;
+    height: 30px;
+}
+
+#gfat-items-per-page {
+    margin-top: -30px;
+}
+
+form#gfat-merge_tags-form {
+    display: flex;
+    align-items: end;
+}
+
+form#gfat-merge_tags-form .search-field:not(:last-of-type) {
+    margin-right: 10px;
+}
+
+/* Date Filter */
+
+#gfat-tab-content .quarter-links {
+    margin-right: 10px !important;
+    display: inline-block;
+}
+
+#gfat-tab-content .quarter-links.this-year {
+    font-weight: bold !important;
+}
+
+#gfat-tab-content .quarter-links.last-year {
+    font-weight: normal !important;
+}
+
+.gfat-date-filter .date-fields {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: start;
+    align-items: flex-end;
+    align-content: start;
+}
+
+.gfat-date-filter .date-fields .start {
+    margin-right: 10px;
+}
+
+.gfat-date-filter .date-fields input[type="date"] {
+    padding: 7px 10px !important;
+}
+
+/* Spam List Add New */
+
+#gfat-spam_list-search-form,
+#gfat-spam_list-add-form {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: start;
+    align-items: flex-end;
+    align-content: start;
+}
+
+#gfat-spam_list-search-form div,
+#gfat-spam_list-add-form div {
+    margin-right: 10px;
+}
+
+/* Buttons */
+
+#gfat-tab-content .button:not(.button-primary) {
+    background: #fff;
+    border: 1px solid #3e7da6;
+    border-radius: 3px;
+    box-shadow: 0 2px 1px rgba(28, 31, 63, .0634624);
+    font-size: .875rem;
+    height: 2.3125rem;
+    line-height: .875rem;
+    padding: .625rem 1.125rem;
+    
+}
+
+#gfat-tab-content .button:active {
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateY(2px);
+}
+
+#gfat-tab-content .add-new-report {
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+}
+
+#gfat-tab-content #gfat-spam_list-delete-selected-button {
+    float: right;
+}
+
+/* Our WP List Table */
+
+#gfat-tab-content .tablenav.top {
+    margin-top: -50px;
+}
+
+#gfat-tab-content .wp-list-table.widefat.forms_page_gf-tools .column-date,
+#gfat-tab-content .wp-list-table.widefat.forms_page_gf-tools .column-time {
+    width: 300px;
+}
+
+#gfat-tab-content tr.copied {
+    background: yellow;
+}
+
+#gfat-tab-content tr.copied td.column-tag {
+    font-weight: bold;
+}
+
+#gfat-tab-content .wp-list-table .column-tag,
+#gfat-tab-content .wp-list-table .column-label {
+    width: 250px;
+}
+
+#gfat-tab-content .wp-list-table .column-copy,
+#gfat-tab-content .wp-list-table .column-ref {
+    width: 170px;
+}
+
+#gfat-tab-content .gfat-spam {
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+}
+
+#gfat-tab-content .gfat-spam.allow {
+    background: green;
+    color: white;
+}
+
+#gfat-tab-content .gfat-spam.deny {
+    background: red;
+    color: white;
+}
+
+/* Progress Bar */
+
+#gfat-tab-content .progress-container {
+    margin-top: 1px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+}
+
+#gfat-tab-content .progress-bar.button {
+    background: repeating-linear-gradient(
+        324deg,
+        #f3f3f3,
+        #f3f3f3 10px,
+        #e0e0e0 10px,
+        #e0e0e0 20px
+    );
+    background-size: 135px 135px;
+    padding: 0 !important;
+    width: 135px;
+    height: 2.3125rem !important;
+    overflow: hidden;
+    animation: stripeAnimation 2s linear infinite;
+}
+
+/* Animated diagonal pattern */
+@keyframes stripeAnimation {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 135px 0;
+    }
+}
+
+#gfat-tab-content .progress {
+    background-color: #4caf50; /* Green color */
+    height: 100%;
+    width: 0;
+    transition: width 0.5s ease-in-out;
+}
+
+#gfat-tab-content .progress-text {
+    margin-top: 7px;
+    text-align: left;
+    padding-left: 10px;
+    box-sizing: border-box;
+}
+
+/* Lists */
+
+#gfat-tab-content ul {
+    list-style: disc;
+    padding: revert;
+    line-height: 1.75rem;
+}
+
+#gfat-tab-content ul.params-list {
+    margin-top: 2rem;
+    font-size: 1rem;
+}
+
+#gfat-tab-content ul.params-list li {
+    margin-bottom: 7px;
+}
+
+#gfat-tab-content ul.params-list code {
+    font-size: 1rem;
+}
+
+/* Code Blocks */
+
+#gfat-tab-content code.shortcode {
+    font-size: 1rem;
+}
+
+#gfat-tab-content .code-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    background-color: #f9f9f9;
+    position: relative;
+    margin: 10px 0;
+}
+
+#gfat-tab-content .code-box pre {
+    margin: 0;
+    overflow-x: auto;
+    /* white-space: pre-wrap; */
+}
+
+#gfat-tab-content .code-box .copy-button {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    padding: 5px 10px;
+    background-color: #0073aa;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#gfat-tab-content .code-box .copy-button:hover {
+    background-color: #005177;
+}
+
+/* Info Box */
+
+#gfat_pre_populate_content .info-cont {
+    /* display: flex; */
+    margin-bottom: 5rem;
+}
+
+#gfat-tab-content .info-box {
+    padding: 20px;
+    background: #FEF1E9;
+    border-radius: 5px;
+    margin-bottom: 3rem;
+    font-size: 1rem;
+}
+
+#gfat-tab-content .gf-merge-tags {
+    margin-top: 1rem;
+}
+
+#gfat-tab-content .gf-merge-tag {
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 0.75rem;
+}
+
+/* Notices */
+
+.gfat-dashboard-notice {
+    font-weight: 500;
+    padding: 10px 16px;
+    display: inline-block;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+}
+
+.gfat-dashboard-notice.success {
+    background: #46b450;
+    color: black;
+}
+
+.gfat-dashboard-notice.warning {
+    background: #ffba00;
+    color: black;
+}
+
+.gfat-dashboard-notice.error {
+    background: #dc3232;
+    color: white;
+}
+
+.gfat-dashboard-notice.info {
+    background: #0073aa;
+    color: white;
+}
+
+/* GoDaddy Firewall Notice */
+
+#gfat-tab-content .access-denied .code-snippet {
+    padding: 20px;
+    background: #FEF1E9;
+    border-radius: 5px;
+    margin-bottom: 3rem;
+    font-size: 1rem;
+}
+
+#gfat-tab-content .access-denied .property-table {
+    margin: 0;
+    border-spacing: 0;
+    box-shadow: none;
+    border: 1px #b8b8b8 solid;
+    border-radius: 0;
+    width: 100%;
+    margin-bottom: 35px;
+    margin-top: 25px;
+    background-color: #fff;
+}
+
+#gfat-tab-content .access-denied .line-height-16 {
+    line-height: 1.6;
+}
+
+#gfat-tab-content .access-denied table.property-table tr:first-child td, 
+#gfat-tab-content .access-denied table.no-top-border tr:first-child td {
+    border-top: 0;
+}
+
+#gfat-tab-content .access-denied table.property-list td:first-child, 
+#gfat-tab-content .access-denied table.property-table td:first-child {
+    font-weight: 700;
+    width: 1%;
+    white-space: nowrap;
+}
+
+#gfat-tab-content .access-denied tbody tr:first-child td {
+    border-color: #c9c9c9;
+}
+
+#gfat-tab-content .access-denied td:first-child {
+    padding-right: 0;
+}
+
+#gfat-tab-content .access-denied td, 
+#gfat-tab-content .access-denied th {
+    padding: 12px;
+}
+
+#gfat-tab-content .access-denied td {
+    border-top: 1px #e2e2e2 solid;
+    vertical-align: top;
+    word-break: break-word;
+}
+
+#gfat-tab-content .access-denied tbody tr:nth-child(2n) {
+    background-color: #fafafa;
+}
+
+/* Other */
+
+#gfat-tab-content .reference {
+    font-style: italic;
+    display: block;
+    margin: 2rem 0 1rem;
+    background: #eee;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#gfat-tab-content p.desc {
+    font-style: italic;
+    margin-bottom: 2rem;
+}
+
+#wpfooter {
+    position: revert;
+}
+
+.apos37-plugins ul { 
+    list-style: none !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}

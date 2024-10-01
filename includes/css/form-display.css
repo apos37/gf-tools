@@ -1,0 +1,19 @@
+/* Notice */
+
+.gfadvtools-notice {
+    background: #F15A2B;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+}
+
+/* Review Page */
+
+.gfield_html .gfadvtools-review-form .please-review {
+    font-size: 1.1rem;
+}
+
+.gfield_html .gfadvtools-review-form table {
+    color: black !important;
+}

@@ -1,0 +1,8 @@
+.gfat-mark-resolved.hide {
+    display: none !important;
+}
+
+.gfat-mark-resolved.in-progress-sep,
+.gfat-mark-resolved.resolved-sep {
+    font-style: normal !important;
+}
