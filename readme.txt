@@ -1,6 +1,6 @@
 === Advanced Tools for Gravity Forms ===
 Contributors: apos37
-Tags: report, spam, merge tags, search, schedule, tests
+Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9.0
 Requires PHP: 7.4
 Tested up to: 6.6.2
