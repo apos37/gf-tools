@@ -14,6 +14,8 @@ Unlock advanced tools and customizations to supercharge your Gravity Forms exper
 
 **Advanced Tools for Gravity Forms** is your go-to solution for enhancing and customizing your Gravity Forms experience. This powerful plugin delivers a rich set of features designed to optimize form management, expand functionality, and tailor forms precisely to your needs. Whether you're looking to streamline your workflow or add cutting-edge capabilities, this plugin is essential for elevating your form game.
 
+**YOU MUST HAVE GRAVITY FORMS INSTALLED TO USE THIS ADD-ON**
+
 == Features ==
 
 === What's Hot ===
@@ -83,6 +85,7 @@ Navigate to Forms > Settings > Advanced Tools. Scroll down to the Merge Tags sec
 
 * For a direct value (such as a contact phone number that may change in the future), you can select "Value" and enter the text or numeric value that you want the merge tag to populate.
 * For more advanced users, you can select "Callback Function," and include the callback function name. This way you can populate stuff more dynamically. Your function should look like:
+
 `<?php
 function callback_name( $form, $entry ) {
     return "your value"; 

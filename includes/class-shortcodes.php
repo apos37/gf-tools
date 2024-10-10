@@ -602,7 +602,7 @@ class GF_Advanced_Tools_Shortcodes {
 
     /**
      * Export entries on the front-end
-     * USAGE: [gfat_export_entries id="1"]
+     * USAGE: [gfat_export_entries id="1" combined="1, 2, 3"]
      *
      * @param array $atts
      * @return string

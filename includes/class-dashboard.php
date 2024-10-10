@@ -1680,7 +1680,8 @@ class GF_Advanced_Tools_Dashboard {
                 'desc'   => __( 'Allow others with specific roles (defined in Advanced Tools plugin settings) to export form entries from the front-end. You can do a single form by ID, or to include a dropdown to pick from a selection of forms you must also enable "Add to Export Entries Shortcode" in each of the forms\' Advanced Tools settings.', 'gf-tools' ),
                 'code'   => '[gfat_export_entries id="1"]',
                 'params' => [
-                    'id' => __( 'The form ID.', 'gf-tools' ).' <em>('.__( 'Optional - If no <code>id</code> is provided, displays a dropdown of forms to choose from', 'gf-tools' ).')</em>',
+                    'id'       => __( 'The form ID.', 'gf-tools' ).' <em>('.__( 'Optional - If no <code>id</code> is provided, checks for <code>combined</code> param, otherwise displays a dropdown of forms to choose from', 'gf-tools' ).')</em>',
+                    'combined' => __( 'Comma-separated list of form IDs.', 'gf-tools' ).' <em>('.__( 'Optional', 'gf-tools' ).')</em>',
                 ],
                 'refs'   => GFADVTOOLS_SETTINGS_URL.'#exporting',
             ]

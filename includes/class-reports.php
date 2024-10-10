@@ -1256,7 +1256,7 @@ class GF_Advanced_Tools_Reports {
         $selected_form_id = isset( $_POST[ 'form_id' ] ) ? absint( $_POST[ 'form_id' ] ) : false;        
 
         if ( isset( $_POST[ 'fields' ] ) ) {
-            $fields_json = sanitize_text_field( rawurldecode( wp_unslash( $_POST[ 'fields' ] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $fields_json = sanitize_text_field( rawurldecode( wp_unslash( $_POST[ 'fields' ] ) ) );
             $selected_fields = json_decode( $fields_json, true );
             $selected_fields = array_map( function( $s ) {
                 return array_map( 'sanitize_text_field', $s );
@@ -1266,7 +1266,7 @@ class GF_Advanced_Tools_Reports {
         }
         
         if ( isset( $_POST[ 'search_criteria' ] ) ) {
-            $search_criteria_json = sanitize_text_field( rawurldecode( wp_unslash( $_POST[ 'search_criteria' ] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $search_criteria_json = sanitize_text_field( rawurldecode( wp_unslash( $_POST[ 'search_criteria' ] ) ) );
             $search_criteria = json_decode( $search_criteria_json, true );
             $search_criteria = filter_var_array( $search_criteria, FILTER_SANITIZE_FULL_SPECIAL_CHARS );
         } else {
