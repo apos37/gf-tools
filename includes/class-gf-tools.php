@@ -499,6 +499,17 @@ class GF_Advanced_Tools extends GFAddOn {
                     ],
                     [
                         'type'    => 'checkbox',
+                        'name'    => 'password_field_group',
+                        'label'   => esc_html__( 'Enable the password field', 'gf-tools' ),
+                        'choices' => [
+                            [
+                                'label' => esc_html__( 'Yes', 'gf-tools' ),
+                                'name'  => 'password_field',
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'    => 'checkbox',
                         'name'    => 'bypass_template_library_group',
                         'label'   => esc_html__( 'Always Bypass Template Library when Creating New Forms', 'gf-tools' ),
                         'tooltip' => esc_html__( 'The template library is the popup that you see when you create a new form. If you always start from scratch, this just saves you a step.', 'gf-tools' ),

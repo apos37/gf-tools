@@ -23,8 +23,12 @@ class GF_Advanced_Tools_Shortcodes {
 	 */
 	public function __construct() {
 
-        // Shortcode
+        // Remove a query string parameter
         add_shortcode( 'gfat_remove_qs', [ $this, 'remove_qs' ] );
+
+        // Entry submitted
+        add_shortcode( 'gfat_entry_submitted', [ $this, 'entry_submitted' ] );
+        add_shortcode( 'gfat_entry_not_submitted', [ $this, 'entry_not_submitted' ] );
 
         // Display Form from ID in URL
         add_shortcode( 'gfat_form', [ $this, 'form' ] );
@@ -76,6 +80,82 @@ class GF_Advanced_Tools_Shortcodes {
 		// Return it
 		return '';
 	} // End remove_qs()
+
+
+    /**
+     * Entry submitted
+     * USAGE: [gfat_entry_submitted form_id="" date_format="F j, Y"][/gfat_entry_submitted]
+     *
+     * @param array $atts
+     * @return string
+     */
+    public function entry_submitted( $atts, $content ) {
+        $HELPERS = new GF_Advanced_Tools_Helpers();
+        $atts = shortcode_atts( [ 'form_id' => '', 'date_format' => 'F j, Y' ], $atts );
+
+        // Get the form id
+		$form_id = absint( $atts[ 'form_id' ] );
+        if ( !$form_id ) {
+            return $HELPERS->administrator_error_message( 'Form ID not provided.' );
+        }
+
+		// Validate the form
+        $form = \GFAPI::get_form( $form_id );
+        if ( !$form ) {
+            return $HELPERS->administrator_error_message( 'Form does not exist.' );
+        }
+
+        // Check for entries
+        $entries = $HELPERS->get_entries_for_user( $form_id );
+        if ( empty( $entries ) ) {
+            return '';
+        }
+
+        // Get the latest entry
+        $most_recent_entry = $entries[0];
+        
+        // Get the date in case they use a merge tag for date
+        if ( strpos( $content, '{date}' ) !== false ) {
+            $date = $most_recent_entry[ 'date_created' ];
+            $date = $HELPERS->convert_date_to_wp_timezone( $date, sanitize_text_field( $atts[ 'date_format' ] ) );
+            $content = str_replace( '{date}', $date, $content );
+        }
+
+        // Return it
+        return wp_kses_post( $content );
+	} // End entry_submitted()
+
+
+    /**
+     * Entry not submitted
+     * USAGE: [gfat_entry_not_submitted form_id=""][/gfat_entry_not_submitted]
+     *
+     * @param array $atts
+     * @return string
+     */
+    public function entry_not_submitted( $atts, $content ) {
+        $HELPERS = new GF_Advanced_Tools_Helpers();
+
+        // Get the form id
+		$atts = shortcode_atts( [ 'form_id' => '' ], $atts );
+		$form_id = absint( $atts[ 'form_id' ] );
+        if ( !$form_id ) {
+            return $HELPERS->administrator_error_message( 'Form ID not provided.' );
+        }
+
+		// Validate the form
+        $form = \GFAPI::get_form( $form_id );
+        if ( !$form ) {
+            return $HELPERS->administrator_error_message( 'Form does not exist.' );
+        }
+
+        // Check for entries
+        $entries = $HELPERS->get_entries_for_user( $form_id );
+        if ( empty( $entries ) ) {
+            return wp_kses_post( $content );
+        }
+		return '';
+	} // End entry_not_submitted()
 
 
     /**

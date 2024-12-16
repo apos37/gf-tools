@@ -252,7 +252,11 @@ class GF_Advanced_Tools_Helpers {
      * @param boolean $ids_only
      * @return array
      */
-    public function get_entries_for_user( $form_id, $user_id, $ids_only = false ) {
+    public function get_entries_for_user( $form_id, $user_id = null, $ids_only = false ) {
+        if ( is_null( $user_id ) ) {
+            $user_id = get_current_user_id();
+        }
+
         $search_criteria = [
             'status'        => 'active',
             'field_filters' => [
@@ -942,4 +946,18 @@ class GF_Advanced_Tools_Helpers {
     public function str_ends_with( $haystack, $needle ) {
         return $needle !== '' && substr( $haystack, -strlen( $needle ) ) === (string)$needle;
     } // End str_ends_with()
+
+
+    /**
+     * Display an error to admins only
+     *
+     * @param string $message
+     * @return string
+     */
+    public function administrator_error_message( $message ) {
+        if ( current_user_can( 'administrator' ) ) {
+            return '<span style="color: red; font-weight: bold;">' . $message . '</span>';
+        }
+        return '';
+    } // End administrator_error_message()
 }

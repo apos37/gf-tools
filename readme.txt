@@ -3,8 +3,8 @@ Contributors: apos37
 Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9.0
 Requires PHP: 7.4
-Tested up to: 6.6.2
-Stable tag: 1.0.2
+Tested up to: 6.7.1
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -84,13 +84,7 @@ Navigate to Forms > Settings > Advanced Tools. Scroll down to the Confirmatation
 Navigate to Forms > Settings > Advanced Tools. Scroll down to the Merge Tags section. Add a new field. Enter a label that you want to use in the merge tag drop downs. Enter a modifier, which will be used in the merge tag itself (ie. `{gfat:[modifier]}`). 
 
 * For a direct value (such as a contact phone number that may change in the future), you can select "Value" and enter the text or numeric value that you want the merge tag to populate.
-* For more advanced users, you can select "Callback Function," and include the callback function name. This way you can populate stuff more dynamically. Your function should look like:
-
-`<?php
-function callback_name( $form, $entry ) {
-    return "your value"; 
-}
-?>`
+* For more advanced users, you can select "Callback Function," and include the callback function name. This way you can populate stuff more dynamically.
 
 = How do I make custom form settings? =
 Navigate to Forms > Settings > Advanced Tools. Scroll down to the For Developers section. Add a new field and enter the field label, meta key and field type. The field will then be added to all of your forms' settings. The form setting values are saved on the form object, and can be used in your custom queries.
@@ -111,5 +105,9 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.3 =
+* Update: Added two more shortcodes (`gfat_entry_submitted` and `gfat_entry_not_submitted`)
+* Update: Added option to enable password field
+
 = 1.0.2 =
 * Created plugin on August 8, 2024

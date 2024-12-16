@@ -1684,6 +1684,26 @@ class GF_Advanced_Tools_Dashboard {
                     'combined' => __( 'Comma-separated list of form IDs.', 'gf-tools' ).' <em>('.__( 'Optional', 'gf-tools' ).')</em>',
                 ],
                 'refs'   => GFADVTOOLS_SETTINGS_URL.'#exporting',
+            ],
+            [
+                'id'     => 'gfat_entry_submitted',
+                'title'  => __( 'Content Displayed if Entry Submitted', 'gf-tools' ),
+                'desc'   => __( 'Display content only if the current user has submitted an entry for a given form. Accepts HTML in the content between the opening and closing shortcode tags. You can use the <code>{date}</code> in your content to display their most recent entry\'s date.', 'gf-tools' ),
+                'code'   => '[gfat_entry_submitted form_id="1" date_format="F j, Y"]You registered on {date}![/gfat_entry_submitted]',
+                'params' => [
+                    'form_id'     => __( 'The form ID.', 'gf-tools' ).' <em>('.$required_text.')</em>',
+                    'date_format' => __( 'Date format if you are using the <code>{date}</code> merge tag in your content.', 'gf-tools' ).' <em>('.__( 'Optional - If no format is provided, it defaults to F j, Y (see reference link below for formatting options).', 'gf-tools' ).')</em>'
+                ],
+                'refs'   => 'https://www.w3schools.com/php/func_date_date.asp',
+            ],
+            [
+                'id'     => 'gfat_entry_not_submitted',
+                'title'  => __( 'Content Displayed if Entry is NOT Submitted', 'gf-tools' ),
+                'desc'   => __( 'Display content only if the current user has NOT submitted an entry for a given form. Accepts HTML in the content between the opening and closing shortcode tags.', 'gf-tools' ),
+                'code'   => '[gfat_entry_not_submitted form_id="1"]<a href="/register/" class="button">Register now!</a>[/gfat_entry_not_submitted]',
+                'params' => [
+                    'form_id'     => __( 'The form ID.', 'gf-tools' ).' <em>('.$required_text.')</em>'
+                ]
             ]
         ];
     } // End shortcodes_data()

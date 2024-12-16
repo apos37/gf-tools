@@ -50,6 +50,11 @@ class GF_Advanced_Tools_Form_Editor {
         if ( isset( $plugin_settings[ 'post_meta_query' ] ) && $plugin_settings[ 'post_meta_query' ] == 1 ) {
             add_filter( 'gform_disable_custom_field_names_query', '__return_true' );
         }
+
+        // Enable the password field
+        if ( isset( $plugin_settings[ 'password_field' ] ) && $plugin_settings[ 'password_field' ] == 1 ) {
+            add_filter( 'gform_enable_password_field', '__return_true' );
+        }
         
         // Remove "Add Field" Buttons
         $add_fields_to_remove = [ 'section', 'file_upload', 'post_section', 'pricing_section' ];
