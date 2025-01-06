@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9.0
 Requires PHP: 7.4
 Tested up to: 6.7.1
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -105,6 +105,10 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.4 =
+* Fix: Some pages in admin area being redirected to homepage and causing broken links in admin menu
+* Update: Added a new shortcode (`gfat_qs_value`)
+
 = 1.0.3 =
 * Update: Added two more shortcodes (`gfat_entry_submitted` and `gfat_entry_not_submitted`)
 * Update: Added option to enable password field

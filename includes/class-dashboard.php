@@ -1704,6 +1704,15 @@ class GF_Advanced_Tools_Dashboard {
                 'params' => [
                     'form_id'     => __( 'The form ID.', 'gf-tools' ).' <em>('.$required_text.')</em>'
                 ]
+            ],
+            [
+                'id'     => 'gfat_qs_value',
+                'title'  => __( 'Return Query String Value', 'gf-tools' ),
+                'desc'   => sprintf( __( 'Returns a query string parameter value if found. Add the <code>param</code> to your URL like so: "<code>%s</code>". In the example the parameter is "id", and the value returned will be "999". This is especially useful to use in an HTML field when passing parameters into a link.', 'gf-tools' ), home_url( 'your-form-page/?id=999' ) ),
+                'code'   => '[gfat_qs_value param="id"]',
+                'params' => [
+                    'param'   => __( 'The URL parameter you will be capturing. Do not use spaces.', 'gf-tools' ).' <em>('.$required_text.')</em>',
+                ]
             ]
         ];
     } // End shortcodes_data()

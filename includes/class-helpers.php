@@ -807,6 +807,8 @@ class GF_Advanced_Tools_Helpers {
      * @return void
      */
     public function remove_qs_without_refresh( $qs = null, $is_admin = true ) {
+        dpr( $qs, null, true );
+        
         // Get the current title
         $page_title = get_the_title();
 
@@ -819,8 +821,11 @@ class GF_Advanced_Tools_Helpers {
             }
             $new_url = remove_query_arg( $qs, $this->get_current_url() );
 
-        } else {
+        } elseif ( !$is_admin ) {
             $new_url = $this->get_current_url( false );
+
+        } else {
+            return;
         }
 
         // Write the script

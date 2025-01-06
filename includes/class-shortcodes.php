@@ -30,6 +30,9 @@ class GF_Advanced_Tools_Shortcodes {
         add_shortcode( 'gfat_entry_submitted', [ $this, 'entry_submitted' ] );
         add_shortcode( 'gfat_entry_not_submitted', [ $this, 'entry_not_submitted' ] );
 
+        // Get query string value
+        add_shortcode( 'gfat_qs_value', [ $this, 'qs_value' ] );
+
         // Display Form from ID in URL
         add_shortcode( 'gfat_form', [ $this, 'form' ] );
 
@@ -69,7 +72,9 @@ class GF_Advanced_Tools_Shortcodes {
         $new_url = !empty( $qs ) ? remove_query_arg( $qs, $HELPERS->get_current_url() ) : $HELPERS->get_current_url( false );
 
         // Enqueue the script only when the shortcode is used
-        wp_enqueue_script( 'gfadvtools_remove_qs', GFADVTOOLS_PLUGIN_DIR.'includes/js/remove-qs.js', [ 'jquery' ], time(), true );
+        if ( !is_admin() ) {
+            wp_enqueue_script( 'gfadvtools_remove_qs', GFADVTOOLS_PLUGIN_DIR.'includes/js/remove-qs.js', [ 'jquery' ], time(), true );
+        }
     
         // Localize the data for the script
         wp_localize_script( 'gfadvtools_remove_qs', 'gfadvtools_remove_qs', [
@@ -156,6 +161,23 @@ class GF_Advanced_Tools_Shortcodes {
         }
 		return '';
 	} // End entry_not_submitted()
+
+
+    /**
+     * Get query string value
+     * USAGE: [gfat_qs_value param=""]
+     *
+     * @param array $atts
+     * @return string
+     */
+    public function qs_value( $atts ) {
+        $atts = shortcode_atts( [ 'param' => '' ], $atts );
+        $param = sanitize_text_field( $atts[ 'param' ] );
+        if ( isset( $_GET[ $param ] ) ) {
+            return esc_html( $_GET[ $param ] );
+        }
+        return;
+	} // End qs_value()
 
 
     /**
