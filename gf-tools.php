@@ -3,7 +3,7 @@
  * Plugin Name:         Advanced Tools for Gravity Forms
  * Plugin URI:          https://apos37.com/wordpress-advanced-tools-for-gravity-forms/
  * Description:         Unlock advanced tools to supercharge your Gravity Forms experience with enhanced features and streamlined management.
- * Version:             1.0.4
+ * Version:             1.0.4.1 
  * Requires at least:   5.9.0
  * Tested up to:        6.7.1
  * Requires PHP:        7.4
@@ -25,7 +25,7 @@ if ( !defined( 'ABSPATH' ) ) {
 define( 'GFADVTOOLS_NAME', ' Advanced Tools for Gravity Forms' );
 define( 'GFADVTOOLS_TEXTDOMAIN', 'gf-tools' );
 define( 'GFADVTOOLS_DISCORD_SUPPORT_URL', 'https://discord.gg/3HnzNEJVnR' );
-define( 'GFADVTOOLS_VERSION', '1.0.4' );
+define( 'GFADVTOOLS_VERSION', '1.0.4.1' );
 define( 'GFADVTOOLS_ADMIN_INCLUDES_URL', trailingslashit( ABSPATH.str_replace( site_url(), '', admin_url( 'includes/' ) ) ) );  // /abspath/.../public_html/wp-admin/includes/
 define( 'GFADVTOOLS_PLUGIN_ROOT', plugin_dir_path( __FILE__ ) );                                                                // /home/.../public_html/wp-content/plugins/gf-tools/
 define( 'GFADVTOOLS_PLUGIN_DIR', plugins_url( '/'.GFADVTOOLS_TEXTDOMAIN.'/' ) );                                                // https://domain.com/wp-content/plugins/gf-tools/

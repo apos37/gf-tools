@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9.0
 Requires PHP: 7.4
 Tested up to: 6.7.1
-Stable tag: 1.0.4
+Stable tag: 1.0.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -105,6 +105,9 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.4.1 =
+* Fix: The gfat_remove_qs shortcode was removing the whole path instead of just the params, even when there were no params found
+
 = 1.0.4 =
 * Fix: Some pages in admin area being redirected to homepage and causing broken links in admin menu
 * Update: Added a new shortcode (`gfat_qs_value`)

@@ -1,5 +1,5 @@
 jQuery( document ).ready( function( $ ) {
-    // console.log( 'Remove QS JS Loaded...' );
+    console.log( 'Remove QS JS Loaded...' );
 
     if ( typeof gfadvtools_remove_qs !== 'undefined' && gfadvtools_remove_qs && gfadvtools_remove_qs.title != '' ) {
         if ( history.pushState ) {

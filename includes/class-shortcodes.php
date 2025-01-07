@@ -61,26 +61,43 @@ class GF_Advanced_Tools_Shortcodes {
      * @return string
      */
     public function remove_qs( $atts ) {
+        if ( is_admin() ) {
+            return;
+        }
+
 		$atts = shortcode_atts( [ 'params' => '' ], $atts );
 		$params = sanitize_text_field( $atts[ 'params' ] );
 		$qs = preg_split( '/[\s,]+/', $params, -1, PREG_SPLIT_NO_EMPTY );
 		$qs = array_map( 'trim', $qs );
 
-		// Get the current title and URL
         $page_title = get_the_title();
         $HELPERS = new GF_Advanced_Tools_Helpers();
-        $new_url = !empty( $qs ) ? remove_query_arg( $qs, $HELPERS->get_current_url() ) : $HELPERS->get_current_url( false );
 
-        // Enqueue the script only when the shortcode is used
-        if ( !is_admin() ) {
-            wp_enqueue_script( 'gfadvtools_remove_qs', GFADVTOOLS_PLUGIN_DIR.'includes/js/remove-qs.js', [ 'jquery' ], time(), true );
+        // Check if any of the specified query strings are present in the URL
+        $query_found = false;
+        foreach ( $qs as $param ) {
+            if ( isset( $_GET[$param] ) ) {
+                $query_found = true;
+                break;
+            }
         }
-    
-        // Localize the data for the script
-        wp_localize_script( 'gfadvtools_remove_qs', 'gfadvtools_remove_qs', [
-            'title' => $page_title,
-            'url'   => $new_url
-        ] );
+        
+        // Only run if the params are found
+        if ( $query_found ) {
+             
+            $new_url = remove_query_arg( $qs );
+
+            // Enqueue the script only when the shortcode is used
+            if ( !is_admin() ) {
+                wp_enqueue_script( 'gfadvtools_remove_qs', GFADVTOOLS_PLUGIN_DIR.'includes/js/remove-qs.js', [ 'jquery' ], time(), true );
+            }
+        
+            // Localize the data for the script
+            wp_localize_script( 'gfadvtools_remove_qs', 'gfadvtools_remove_qs', [
+                'title' => $page_title,
+                'url'   => $new_url
+            ] );
+        }        
 	
 		// Return it
 		return '';
