@@ -107,13 +107,16 @@ jQuery( $ => {
 
     // Function to add fields to the meta box
     function addFieldsToMetaBox( formID, title, fields, type ) {
+        if ( !title.endsWith( 'Form' ) ) {
+            title = title + ' Form';
+        }
         const formSectionContainer = $( `#gfat_fields_${type} .inside` );
         const newFormSection = $( '<div>', { 
             id: 'gfat-form-section-' + formID, 
             class: 'gfat-form-section',
             'data-form-id': formID
         } )
-        .append( '<h3>' + title + ' Form</h3>' )
+        .append( '<h3>' + title + '</h3>' )
         .append( '<div class="gfat-form-cont"></div>' );
 
         // Append the new form section to the container

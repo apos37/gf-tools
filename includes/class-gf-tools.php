@@ -524,7 +524,7 @@ class GF_Advanced_Tools extends GFAddOn {
                         'type'    => 'checkbox',
                         'name'    => 'ajax_saving_group',
                         'label'   => esc_html__( 'Disable AJAX Saving for All Forms', 'gf-tools' ),
-                        'tooltip' => esc_html__( 'The template library is the popup that you see when you create a new form. If you always start from scratch, this just saves you a step.', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'This will disable saving the form in the form editor without having to refresh. Sometimes the AJAX will cause conflicts, so this just saves the form on refresh.', 'gf-tools' ),
                         'choices' => [
                             [
                                 'label' => esc_html__( 'Yes', 'gf-tools' ),
@@ -675,7 +675,7 @@ class GF_Advanced_Tools extends GFAddOn {
                         'input_type' => 'password',
                         'name'       => 'api_spam_key',
                         'label'      => esc_html__( 'API Key for Remote Spam List Access', 'gf-tools' ),
-                        'tooltip'    => esc_html__( 'On your host website, choose "Host" in the "Enable Enhanced Spam Filtering" setting above. Then generate an API Key underneath it. Copy this key and enter it here.', 'gf-tools' ),
+                        'tooltip'    => esc_html__( 'On your client website(s), choose "Client" in the "Enable Enhanced Spam Filtering" setting above. Copy this key and enter it there.', 'gf-tools' ),
                         'class'      => 'large',
                     ],
                     [
@@ -694,6 +694,18 @@ class GF_Advanced_Tools extends GFAddOn {
                         'placeholder' => 'https://'
                     ],
                     $incl_delete_spam_list_button,
+                    [
+                        'type'    => 'checkbox',
+                        'name'    => 'disable_word_boundaries_group',
+                        'label'   => esc_html__( 'Disable Word Boundaries in Spam Filtering', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'By default, only whole words are matched. For example, the keyword "Pekly" will match "Pekly" but not "HarryPekly." Disabling word boundaries allows matching keywords anywhere, even within other words.', 'gf-tools' ),
+                        'choices' => [
+                            [
+                                'label' => esc_html__( 'Yes', 'gf-tools' ),
+                                'name'  => 'disable_word_boundaries',
+                            ],
+                        ],
+                    ],
                     [
                         'type'    => 'checkbox',
                         'name'    => 'prevent_ip_group',
@@ -736,7 +748,7 @@ class GF_Advanced_Tools extends GFAddOn {
                     [
                         'type'    => 'checkbox',
                         'name'    => 'entries_export_roles_group',
-                        'label'   => wp_kses( __( 'Which Addtional Roles (Besides Administrator) Can Export Entries on <code>[gfat_export_entries]</code> Shortcode', 'gf-tools' ), [ 'code' => [] ] ),
+                        'label'   => wp_kses( __( 'Which Additional Roles (Besides Administrator) Can Export Entries on <code>[gfat_export_entries]</code> Shortcode', 'gf-tools' ), [ 'code' => [] ] ),
                         'tooltip' => esc_html__( 'The [gfat_export_entries] shortcode can be used to export entries on the front-end. You must also enable "Add to Export Entries Shortcode" in the forms\' Advanced Tools settings.', 'gf-tools' ),
                         'choices' => $role_choices,
                     ],

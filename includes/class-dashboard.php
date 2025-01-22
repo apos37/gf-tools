@@ -629,7 +629,7 @@ class GF_Advanced_Tools_Dashboard {
             'form_title' => __( 'Form Title', 'gf-tools' ),
             'form_id'    => __( 'Form ID', 'gf-tools' ),
             'count'      => __( 'Number of Entries', 'gf-tools' ),
-            'source'     => __( 'Source Page', 'gf-tools' )
+            // 'source'     => __( 'Source Page', 'gf-tools' )
         ];
 
         // Collect data
@@ -664,7 +664,7 @@ class GF_Advanced_Tools_Dashboard {
             ], admin_url( 'admin.php' ) );
 
             // TODO: Get the source link if a page is associated with it
-            $source_link = '';
+            // $source_link = '';
 
             // The data
             $data[] = [
@@ -672,7 +672,7 @@ class GF_Advanced_Tools_Dashboard {
                 'form_title' => $form_title,
                 'form_id'    => $form_id,
                 'count'      => $count,
-                'source'     => $source_link
+                // 'source'     => $source_link
             ];
         }
 
@@ -892,7 +892,7 @@ class GF_Advanced_Tools_Dashboard {
             'form_title' => __( 'Form Title', 'gf-tools' ),
             'form_id'    => __( 'Form ID', 'gf-tools' ),
             'count'      => __( 'Number of Spam Entries', 'gf-tools' ),
-            'source'     => __( 'Source Page', 'gf-tools' ),
+            // 'source'     => __( 'Source Page', 'gf-tools' ),
             'actions'    => __( 'Actions', 'gf-tools' )
         ];
 
@@ -950,7 +950,7 @@ class GF_Advanced_Tools_Dashboard {
             ], admin_url( 'admin.php' ) );
 
             // TODO: Get the source link if a page is associated with it
-            $source_link = '';
+            // $source_link = '';
 
             // Actions
             if ( $count > 0 ) {
@@ -973,7 +973,7 @@ class GF_Advanced_Tools_Dashboard {
                 'form_title' => $form_title,
                 'form_id'    => $form_id,
                 'count'      => $count,
-                'source'     => $source_link,
+                // 'source'     => $source_link,
                 'actions'    => $actions
             ];
         }
@@ -992,8 +992,14 @@ class GF_Advanced_Tools_Dashboard {
         $location = isset( $this->plugin_settings[ 'spam_filtering' ] ) ? sanitize_key( $this->plugin_settings[ 'spam_filtering' ] ) : 'local';
         $is_client = ( $location == 'client' );
         $host_site_url = ( $is_client && isset( $this->plugin_settings[ 'spam_list_url' ] ) ) ? sanitize_text_field( $this->plugin_settings[ 'spam_list_url' ] ) : false;
+        $api_spam_key = ( $is_client && isset( $this->plugin_settings[ 'api_spam_key' ] ) ) ? sanitize_text_field( $this->plugin_settings[ 'api_spam_key' ] ) : false;
         $home_url = home_url();
         $spam_list_created = get_option( 'gfat_spam_list_table_created' );
+
+        if ( $is_client && ( !$host_site_url || !$api_spam_key ) ) {
+            echo '<em>This site is set up as a Client, but we are missing an API or home site URL. Please enter them in the Plugin Settings.</em>';
+            return;
+        }
 
         // Helpers
         $HELPERS = new GF_Advanced_Tools_Helpers();
@@ -1015,7 +1021,7 @@ class GF_Advanced_Tools_Dashboard {
 
         // Nonce
         $nonce = wp_create_nonce( $this->nonce );
-        $nonce_verified = isset( $_REQUEST[ '_wpnonce' ] ) && wp_verify_nonce( sanitize_text_field( wp_unslash ( $_REQUEST[ '_wpnonce' ] ) ), $this->nonce );
+        $nonce_verified = isset( $_REQUEST[ '_wpnonce' ] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST[ '_wpnonce' ] ) ), $this->nonce );
 
         // Local
         if ( !$is_client && $spam_list_created && isset( $_REQUEST[ '_wpnonce' ] ) && 
@@ -1293,7 +1299,9 @@ class GF_Advanced_Tools_Dashboard {
                     </select>
                 </div>
                 <input type="submit" value="<?php echo esc_html__( 'Submit', 'gf-tools' ); ?>" id="gfat-<?php echo esc_attr( $current_tab ); ?>-search-button" class="button button-primary"/>
-                <a class="import-export-link" href="<?php echo esc_url( add_query_arg( [ 'page' => 'gf_export', 'subview' => 'import_spam_list' ], admin_url( 'admin.php' ) ) ); ?>">Import</a>
+                <?php if ( !$is_client ) { ?>
+                    <a class="import-export-link" href="<?php echo esc_url( add_query_arg( [ 'page' => 'gf_export', 'subview' => 'import_spam_list' ], admin_url( 'admin.php' ) ) ); ?>">Import</a>
+                <?php } ?>
             </form>
         </div>
         <br>
@@ -2749,7 +2757,7 @@ class GF_Advanced_Tools_Dashboard {
      */
     public function ajax_get_all_spam_entry_ids() {
         // Verify nonce
-        if ( !isset( $_REQUEST[ '_wpnonce' ] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash ( $_REQUEST[ '_wpnonce' ] ) ), $this->nonce ) ) {
+        if ( !isset( $_REQUEST[ 'nonce' ] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST[ 'nonce' ] ) ), $this->nonce ) ) {
             exit( esc_html__( 'No naughty business please.', 'gf-tools' ) );
         }
         
@@ -2795,7 +2803,7 @@ class GF_Advanced_Tools_Dashboard {
      */
     public function ajax_delete_spam_entry() {
         // Verify nonce
-        if ( !isset( $_REQUEST[ '_wpnonce' ] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash ( $_REQUEST[ '_wpnonce' ] ) ), $this->nonce ) ) {
+        if ( !isset( $_REQUEST[ 'nonce' ] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST[ 'nonce' ] ) ), $this->nonce ) ) {
             exit( esc_html__( 'No naughty business please.', 'gf-tools' ) );
         }
     

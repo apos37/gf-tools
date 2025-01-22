@@ -178,7 +178,7 @@ jQuery( $ => {
         }
 
         // Delete all entries
-        const deleteAllEntries = async () => {
+        const deleteAllEntries = async ( nonce, formID ) => {
             try {
                 // Get the entry IDs to delete
                 const response = await $.ajax( {
@@ -260,7 +260,7 @@ jQuery( $ => {
         }
 
         // Do it
-        deleteAllEntries();
+        deleteAllEntries( nonce, formID );
     } );
 
 

@@ -1340,7 +1340,7 @@ class GF_Advanced_Tools_Spam {
         }
     
         // If the field is of type email, text, or textarea
-        if ( in_array( $field->type, [ 'email', 'text', 'textarea' ] ) ) {
+        if ( in_array( $field->type, [ 'name', 'email', 'text', 'textarea' ] ) ) {
 
             // $field_id = $field->id;
             // $field_value = isset( $form[ $field_id ] ) ? $form[ $field_id ] : $value;
@@ -1373,12 +1373,19 @@ class GF_Advanced_Tools_Spam {
                 }
 
             } else {
+
+                // Are we disabling word boundaries?
+                $disable_word_boundaries = isset( $plugin_settings[ 'disable_word_boundaries' ] ) && $plugin_settings[ 'disable_word_boundaries' ] == 1;
                 
                 // Check text and textarea fields
                 foreach ( $keyword_actions as $keyword => $allowed ) {
-                    if ( preg_match( '/\b' . preg_quote( $keyword, '/' ) . '\b/i', $value ) && !$allowed ) {
-                        $result[ 'is_valid' ] = false;
-                        $result[ 'message' ] = "Keyword '{$keyword}' is not allowed.";
+                    $pattern = $disable_word_boundaries 
+                        ? '/' . preg_quote( $keyword, '/' ) . '/i' 
+                        : '/\b' . preg_quote( $keyword, '/' ) . '\b/i';
+
+                    if ( preg_match( $pattern, $value ) && !$allowed ) {
+                        $result['is_valid'] = false;
+                        $result['message'] = "Keyword '{$keyword}' is not allowed.";
                         return $result;
                     }
                 }
@@ -1481,13 +1488,16 @@ class GF_Advanced_Tools_Spam {
             }
         }
 
+        // Are we disabling word boundaries?
+        $disable_word_boundaries = isset( $plugin_settings[ 'disable_word_boundaries' ] ) && $plugin_settings[ 'disable_word_boundaries' ] == 1;
+
         // Initialize spam status flags
         $is_spam = false;
         $is_allowed = false;
         $log_message = '';
 
         // Process each field
-        $field_types_to_filter = [ 'email', 'text', 'textarea' ];
+        $field_types_to_filter = [ 'name', 'email', 'text', 'textarea' ];
         foreach ( $form[ 'fields' ] as $field ) {
 
             $type = $field->type;
@@ -1530,7 +1540,11 @@ class GF_Advanced_Tools_Spam {
 
                 // Check text and textarea fields
                 foreach ( $keyword_actions as $keyword => $allowed ) {
-                    if ( preg_match( '/\b' . preg_quote( $keyword, '/' ) . '\b/i', $value ) ) {
+                    $pattern = $disable_word_boundaries 
+                        ? '/' . preg_quote( $keyword, '/' ) . '/i' 
+                        : '/\b' . preg_quote( $keyword, '/' ) . '\b/i';
+
+                    if ( preg_match( $pattern, $value ) ) {
                         $is_spam = !$allowed;
                         $log_message = "Keyword '$keyword' found in $type field with action '" . ( $allowed ? 'allow' : 'deny' ) . "'.";
                         break 2;

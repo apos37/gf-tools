@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9.0
 Requires PHP: 7.4
 Tested up to: 6.7.1
-Stable tag: 1.0.4.1
+Stable tag: 1.0.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -105,6 +105,18 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.4.3 =
+* Update: Added plugin option to disable word boundaries in spam filtering
+* Tweak: Update info box on some plugin settings
+* Fix: Remove import link from spam list on client sites
+* Fix: Spam list showing for Client sites even though API and host site URL are missing
+* Tweak: Removed unused source columns
+* Fix: Delete All Spam button from Spam Entries section had a nonce error
+
+= 1.0.4.2 =
+* Fix: User meta on report builder wasn't showing up correctly in the report
+* Fix: Report builder showing an empty form field when no custom fields have been selected in the form settings
+
 = 1.0.4.1 =
 * Fix: The gfat_remove_qs shortcode was removing the whole path instead of just the params, even when there were no params found
 

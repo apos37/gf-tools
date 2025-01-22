@@ -806,9 +806,7 @@ class GF_Advanced_Tools_Helpers {
      * @param boolean $is_admin
      * @return void
      */
-    public function remove_qs_without_refresh( $qs = null, $is_admin = true ) {
-        dpr( $qs, null, true );
-        
+    public function remove_qs_without_refresh( $qs = null, $is_admin = true ) {        
         // Get the current title
         $page_title = get_the_title();
 

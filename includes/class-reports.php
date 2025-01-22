@@ -672,6 +672,9 @@ class GF_Advanced_Tools_Reports {
             $my_form_settings = $this->plugin_settings[ 'custom_form_settings' ];
             if ( !empty( $my_form_settings ) ) {
                 foreach ( $my_form_settings as $setting ) {
+                    if ( !$setting[ 'label' ] || !$setting[ 'meta_key' ] ) {
+                        continue;
+                    }
                     $form_meta[ $setting[ 'meta_key' ] ] = $setting[ 'label' ];
                 }
             }
@@ -681,7 +684,7 @@ class GF_Advanced_Tools_Reports {
         echo '<div class="gfat-checkbox-cont">
             <input type="checkbox" id="gfat-select-all-'.esc_attr( $type ).'" class="gfat-select-all" data-type="'.esc_attr( $type ).'">
             <label for="gfat-select-all-'.esc_attr( $type ).'">'.esc_html__( 'Select All', 'gf-tools' ).'</label>
-        </div>';
+        </div><br><br>';
 
         // Form Meta
         echo '<div id="gfat-form-section-0" class="gfat-form-section" data-form-id="0">
@@ -711,10 +714,14 @@ class GF_Advanced_Tools_Reports {
 
                 // Selected fields
                 $fields = isset( $selected_fields[ $selected_form ] ) ? $selected_fields[ $selected_form ] : [];
+                $title = esc_attr( $form[ 'title' ] );
+                if ( substr( $title, -4 ) !== 'Form' ) {
+                    $title .= ' Form';
+                }
 
                 // Title
                 echo '<div id="gfat-form-section-'.esc_attr( $selected_form ).'" class="gfat-form-section" data-form-id="'.esc_attr( $selected_form ).'">
-                    <h3>'.esc_attr( $form[ 'title' ] ).' Form</h3>
+                    <h3>'.$title.'</h3>
                     <div class="gfat-form-cont">';
 
                         $form_settings = (new GF_Advanced_Tools)->get_form_settings( $form );
@@ -803,7 +810,7 @@ class GF_Advanced_Tools_Reports {
 
                         // Custom meta
                         if ( isset( $form_settings ) ) {
-                            if ( isset( $form_settings[ 'add_user_meta' ] ) && $form_settings[ 'add_user_meta' ] != 1 ) {
+                            if ( isset( $form_settings[ 'add_user_meta' ] ) && $form_settings[ 'add_user_meta' ] != '' ) {
                                 $meta_keys_string = sanitize_text_field( $form_settings[ 'add_user_meta' ] );
                                 
                                 if ( strpos( $meta_keys_string, ',' ) !== false ) {
@@ -816,6 +823,8 @@ class GF_Advanced_Tools_Reports {
                                 $meta_keys = array_filter( $meta_keys );
 
                                 foreach ( $meta_keys as $meta_key ) {
+
+                                    $meta_key = 'user-meta-' . $meta_key;
 
                                     $is_selected = in_array( $meta_key, array_keys( $fields ) );
                                     if ( $is_selected ) {
@@ -1337,12 +1346,24 @@ class GF_Advanced_Tools_Reports {
             foreach ( $field_id_data as $field_data ) {
                 $field_id = $field_data[ 'id' ];
 
+                // Form meta
                 if ( $field_data[ 'is_form_meta' ] ) {
                     $value = sanitize_text_field( $selected_form[ $field_id ] );
                     if ( $field_id == 'date_created' ) {
                         $value = gmdate( $date_format, strtotime( $value ) );
                     }
 
+                // User meta
+                } elseif ( str_starts_with( $field_id, 'user-meta-' ) ) {
+                    $user_id = $entry[ 'created_by' ];
+                    if ( $user_id ) {
+                        $meta_key = substr( $field_id, strlen( 'user-meta-' ) );
+                        $value = get_user_meta( $user_id, $meta_key, true );
+                    } else {
+                        $value = 'Logged-out user';
+                    }
+
+                // Else
                 } else {
                     $value = isset( $entry[ $field_id ] ) ? $entry[ $field_id ] : '';
                     $value = $HELPERS->filter_entry_value( $value, $field_id, $entry, $selected_form, $date_format, $HELPERS );

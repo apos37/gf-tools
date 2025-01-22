@@ -550,6 +550,8 @@ class GF_Advanced_Tools_Shortcodes {
                             
                                 foreach ( $entries as $entry ) {
 
+                                    $user_id = $entry[ 'created_by' ];
+
                                     $results .= '<tr>';
 
                                         $col_num = 0;
@@ -558,19 +560,33 @@ class GF_Advanced_Tools_Shortcodes {
 
                                             foreach ( $fields as $field_id => $label ) {
 
-                                                $class = 'col-page-field-'.$form_id.'-'.$field_id;
-
-                                                if ( $form_id == 0 ) {
-                                                    $value = sanitize_text_field( $selected_form[ $field_id ] );
-                                                    if ( $field_id == 'date_created' ) {
-                                                        $value = gmdate( $date_format, strtotime( $value ) );
+                                                // User meta
+                                                if ( str_starts_with( $field_id, 'user-meta-' ) ) {
+                                                    if ( $user_id ) {
+                                                        $meta_key = substr( $field_id, strlen( 'user-meta-' ) );
+                                                        $value = get_user_meta( $user_id, $meta_key, true );
+                                                    } else {
+                                                        $value = 'Logged-out user';
                                                     }
 
+                                                // Else
                                                 } else {
-                                                    $value = isset( $entry[ $field_id ] ) ? $entry[ $field_id ] : '';
-                                                    $value = $HELPERS->filter_entry_value( $value, $field_id, $entry, $selected_form, $date_format, $HELPERS, false );
+
+                                                    $class = 'col-page-field-'.$form_id.'-'.$field_id;
+
+                                                    if ( $form_id == 0 ) {
+                                                        $value = sanitize_text_field( $selected_form[ $field_id ] );
+                                                        if ( $field_id == 'date_created' ) {
+                                                            $value = gmdate( $date_format, strtotime( $value ) );
+                                                        }
+
+                                                    } else {
+                                                        $value = isset( $entry[ $field_id ] ) ? $entry[ $field_id ] : '';
+                                                        $value = $HELPERS->filter_entry_value( $value, $field_id, $entry, $selected_form, $date_format, $HELPERS, false );
+                                                    }
                                                 }
 
+                                                // Link the first column
                                                 $col_num++;
                                                 if ( $link_first_col && $col_num === 1 ) {
                                                     $entry_url = add_query_arg( [
@@ -581,6 +597,7 @@ class GF_Advanced_Tools_Shortcodes {
                                                     ], admin_url( 'admin.php' ) );
                                                     $value = '<a href="'.$entry_url.'" target="_blank">'.$value.'</a>';
                                                 }
+                                                
                                                 $results .= '<td class="'.esc_attr( $class ).'">'.$value.'</td>';
                                                 
                                             }
@@ -633,7 +650,21 @@ class GF_Advanced_Tools_Shortcodes {
                                 }
                                 
                                 // Page numbers
-                                for ( $i = 1; $i <= $total_pages; $i++ ) {
+                                if ( $total_pages <= 5 ) {
+                                    // If there are 5 or fewer pages, show all pages
+                                    $start_page = 1;
+                                    $end_page = $total_pages;
+                                } elseif ( $current_page > $total_pages - 5 ) {
+                                    // If we're in the last 5 pages, show the last 5 pages
+                                    $start_page = max( 1, $total_pages - 4 );
+                                    $end_page = $total_pages;
+                                } else {
+                                    // Otherwise, show the next 5 pages
+                                    $start_page = $current_page;
+                                    $end_page = min( $start_page + 4, $total_pages );  // Calculate end page, no more than 5 pages ahead
+                                }
+
+                                for ( $i = $start_page; $i <= $end_page; $i++ ) {
                                     $page_num_url = add_query_arg( [
                                         'per_page' => $page_size,
                                         'page_num' => $i
