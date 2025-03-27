@@ -1,10 +1,10 @@
 === Advanced Tools for Gravity Forms ===
 Contributors: apos37
 Tags: report, spam, merge tags, search, schedule
-Requires at least: 5.9.0
+Requires at least: 5.9
 Requires PHP: 7.4
-Tested up to: 6.7.1
-Stable tag: 1.0.4.3
+Tested up to: 6.7
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -83,8 +83,7 @@ Navigate to Forms > Settings > Advanced Tools. Scroll down to the Confirmatation
 = How do I make custom merge tags? =
 Navigate to Forms > Settings > Advanced Tools. Scroll down to the Merge Tags section. Add a new field. Enter a label that you want to use in the merge tag drop downs. Enter a modifier, which will be used in the merge tag itself (ie. `{gfat:[modifier]}`). 
 
-* For a direct value (such as a contact phone number that may change in the future), you can select "Value" and enter the text or numeric value that you want the merge tag to populate.
-* For more advanced users, you can select "Callback Function," and include the callback function name. This way you can populate stuff more dynamically.
+* For a direct value (such as a contact phone number that may change in the future), you can select "Value" and enter the text or numeric value that you want the merge tag to populate. For more advanced users, you can select "Callback Function," and include the callback function name. This way you can populate stuff more dynamically.
 
 = How do I make custom form settings? =
 Navigate to Forms > Settings > Advanced Tools. Scroll down to the For Developers section. Add a new field and enter the field label, meta key and field type. The field will then be added to all of your forms' settings. The form setting values are saved on the form object, and can be used in your custom queries.
@@ -105,6 +104,12 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.5 =
+* Tweak: Optimization
+
+= 1.0.4.4 =
+* Fix: Spam list causing issues on name fields
+
 = 1.0.4.3 =
 * Update: Added plugin option to disable word boundaries in spam filtering
 * Tweak: Update info box on some plugin settings

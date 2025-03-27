@@ -1,36 +1,51 @@
 <?php
 /**
  * Plugin Name:         Advanced Tools for Gravity Forms
- * Plugin URI:          https://apos37.com/wordpress-advanced-tools-for-gravity-forms/
+ * Plugin URI:          https://github.com/apos37/gf-tools
  * Description:         Unlock advanced tools to supercharge your Gravity Forms experience with enhanced features and streamlined management.
- * Version:             1.0.4.3 
- * Requires at least:   5.9.0
- * Tested up to:        6.7.1
+ * Version:             1.0.5
+ * Requires at least:   5.9
+ * Tested up to:        6.7
  * Requires PHP:        7.4
- * Author:              Apos37
- * Author URI:          https://apos37.com/
+ * Author:              WordPress Enhanced
+ * Author URI:          https://wordpressenhanced.com/
+ * Support URI:         https://discord.gg/3HnzNEJVnR
  * Text Domain:         gf-tools
  * License:             GPLv2 or later
  * License URI:         http://www.gnu.org/licenses/gpl-2.0.txt
+ * Created on:          August 8, 2024
  */
 
-// Exit if accessed directly.
-if ( !defined( 'ABSPATH' ) ) {
-	exit;
-}
+
+/**
+ * Exit if accessed directly.
+ */
+if ( !defined( 'ABSPATH' ) ) exit;
+
 
 /**
  * Defines
  */
-define( 'GFADVTOOLS_NAME', ' Advanced Tools for Gravity Forms' );
-define( 'GFADVTOOLS_TEXTDOMAIN', 'gf-tools' );
-define( 'GFADVTOOLS_DISCORD_SUPPORT_URL', 'https://discord.gg/3HnzNEJVnR' );
-define( 'GFADVTOOLS_VERSION', '1.0.4.3' );
+$plugin_data = get_file_data( __FILE__, [
+    'name'         => 'Plugin Name',
+    'version'      => 'Version',
+    'textdomain'   => 'Text Domain',
+    'support_uri'  => 'Support URI',
+] );
+
+
+/**
+ * Defines
+ */
+define( 'GFADVTOOLS_VERSION', $plugin_data[ 'version' ] );
+define( 'GFADVTOOLS_NAME', $plugin_data[ 'name' ] );
+define( 'GFADVTOOLS_TEXTDOMAIN', $plugin_data[ 'textdomain' ] );
 define( 'GFADVTOOLS_ADMIN_INCLUDES_URL', trailingslashit( ABSPATH.str_replace( site_url(), '', admin_url( 'includes/' ) ) ) );  // /abspath/.../public_html/wp-admin/includes/
 define( 'GFADVTOOLS_PLUGIN_ROOT', plugin_dir_path( __FILE__ ) );                                                                // /home/.../public_html/wp-content/plugins/gf-tools/
 define( 'GFADVTOOLS_PLUGIN_DIR', plugins_url( '/'.GFADVTOOLS_TEXTDOMAIN.'/' ) );                                                // https://domain.com/wp-content/plugins/gf-tools/
 define( 'GFADVTOOLS_SETTINGS_URL', admin_url( 'admin.php?page=gf_settings&subview='.GFADVTOOLS_TEXTDOMAIN ) );                  // https://domain.com/wp-admin/admin.php?page=gf_settings&subview=gf-tools/
 define( 'GFADVTOOLS_DASHBOARD_URL', admin_url( 'admin.php?page='.GFADVTOOLS_TEXTDOMAIN ) );                                     // https://domain.com/wp-admin/admin.php?page=gf-tools
+define( 'GFADVTOOLS_DISCORD_SUPPORT_URL', $plugin_data[ 'support_uri' ] );
 
 
 /**
@@ -117,7 +132,7 @@ function gfadvtools_plugin_row_meta( $links, $file ) {
 
         // Add the link
         $row_meta = [
-            'docs'    => '<a href="'.esc_url( 'https://apos37.com/wordpress-advanced-tools-for-gravity-forms/' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Website Link', 'gf-tools' ).'">'.esc_html__( 'Website', 'gf-tools' ).'</a>',
+            // 'docs'    => '<a href="'.esc_url( 'https://apos37.com/wordpress-advanced-tools-for-gravity-forms/' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Website Link', 'gf-tools' ).'">'.esc_html__( 'Website', 'gf-tools' ).'</a>',
             'discord' => '<a href="'.esc_url( 'https://discord.gg/3HnzNEJVnR' ).'" target="_blank" aria-label="'.esc_attr__( 'Plugin Support on Discord', 'gf-tools' ).'">'.esc_html__( 'Discord Support', 'gf-tools' ).'</a>'
         ];
 

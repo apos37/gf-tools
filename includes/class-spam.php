@@ -1340,7 +1340,7 @@ class GF_Advanced_Tools_Spam {
         }
     
         // If the field is of type email, text, or textarea
-        if ( in_array( $field->type, [ 'name', 'email', 'text', 'textarea' ] ) ) {
+        if ( in_array( $field->type, [ 'email', 'text', 'textarea' ] ) ) {
 
             // $field_id = $field->id;
             // $field_value = isset( $form[ $field_id ] ) ? $form[ $field_id ] : $value;
@@ -1384,8 +1384,8 @@ class GF_Advanced_Tools_Spam {
                         : '/\b' . preg_quote( $keyword, '/' ) . '\b/i';
 
                     if ( preg_match( $pattern, $value ) && !$allowed ) {
-                        $result['is_valid'] = false;
-                        $result['message'] = "Keyword '{$keyword}' is not allowed.";
+                        $result[ 'is_valid' ] = false;
+                        $result[ 'message' ] = "Keyword '{$keyword}' is not allowed.";
                         return $result;
                     }
                 }
@@ -1497,7 +1497,7 @@ class GF_Advanced_Tools_Spam {
         $log_message = '';
 
         // Process each field
-        $field_types_to_filter = [ 'name', 'email', 'text', 'textarea' ];
+        $field_types_to_filter = [ 'email', 'text', 'textarea' ];
         foreach ( $form[ 'fields' ] as $field ) {
 
             $type = $field->type;
