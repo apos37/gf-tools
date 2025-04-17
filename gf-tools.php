@@ -3,12 +3,12 @@
  * Plugin Name:         Advanced Tools for Gravity Forms
  * Plugin URI:          https://github.com/apos37/gf-tools
  * Description:         Unlock advanced tools to supercharge your Gravity Forms experience with enhanced features and streamlined management.
- * Version:             1.0.5
+ * Version:             1.0.6
  * Requires at least:   5.9
- * Tested up to:        6.7
+ * Tested up to:        6.8
  * Requires PHP:        7.4
- * Author:              WordPress Enhanced
- * Author URI:          https://wordpressenhanced.com/
+ * Author:              PluginRx
+ * Author URI:          https://pluginrx.com/
  * Support URI:         https://discord.gg/3HnzNEJVnR
  * Text Domain:         gf-tools
  * License:             GPLv2 or later

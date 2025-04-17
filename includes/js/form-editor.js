@@ -1,5 +1,6 @@
 jQuery( $ => {
-    console.log( 'Form Editor Script Loaded...' );
+    // console.log( 'Form Editor Script Loaded...' );
+    
     var urlParams = new URLSearchParams( window.location.search );
     var page = urlParams.get( 'page' );
     var id = urlParams.get( 'id' );

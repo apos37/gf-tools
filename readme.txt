@@ -3,8 +3,8 @@ Contributors: apos37
 Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9
 Requires PHP: 7.4
-Tested up to: 6.7
-Stable tag: 1.0.5
+Tested up to: 6.8
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -104,7 +104,11 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.6 =
+* Update: Updated author name and website again per WordPress trademark policy
+
 = 1.0.5 =
+* Update: Changed author name from Apos37 to WordPress Enhanced, new Author URI
 * Tweak: Optimization
 
 = 1.0.4.4 =
