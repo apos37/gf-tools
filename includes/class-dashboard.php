@@ -781,63 +781,69 @@ class GF_Advanced_Tools_Dashboard {
         // Collect data
         $data = [];
 
-        // Iter the forms
-        foreach ( $forms as $form ) {
-            $form_id = intval( $form[ 'id' ] );
-            $form_title = sanitize_text_field( $form[ 'title' ] );
+        $form_ids = [];
+        if ( $selected_form_id ) {
+            $form_ids = $selected_form_id;
+        } else {
+            foreach ( $forms as $form ) {
+                $form_ids[] = intval( $form[ 'id' ] );
+            }
+        }
 
-            // Only display the one we have selected
-            if ( $selected_form_id && $selected_form_id !== $form_id ) {
-                continue;
+        // Get the entries filtered by date
+        $search_criteria = [
+            'status' => 'active',
+        ];
+        $paging = [ 'offset' => 0, 'page_size' => $total_count ];
+        $entries = GFAPI::get_entries( $form_ids, $search_criteria, [], $paging );
+
+        // List them
+        foreach ( $entries as $entry ) {
+
+            $entry_id = intval( $entry[ 'id' ] );
+            $form_id = $entry[ 'form_id' ];
+            
+            $entry_link = add_query_arg( [
+                'page' => 'gf_entries',
+                'view' => 'entry',
+                'id'   => $form_id,
+                'lid'  => $entry_id
+            ], admin_url( 'admin.php' ) );
+
+            $user_id = intval( $entry[ 'created_by' ] );
+            if ( $user_id && $user = get_userdata( $user_id ) ) {
+                $user_display = $user->display_name;
+            } else {
+                $user_display = __( 'Guest', 'gf-tools' );
             }
 
-            // Get the entries filtered by date
-            $search_criteria = [
-                'status' => 'active',
+            $source_url = filter_var( $entry[ 'source_url' ], FILTER_SANITIZE_URL );
+            $source_title = $source_url;
+            if ( $post_id = url_to_postid( $source_url ) ) {
+                $title = get_the_title( $post_id );
+                if ( $title ) {
+                    $source_title = sanitize_text_field( $title );
+                }
+            }
+            $source_link = '<a href="'.$source_url.'" target="_blank">'.$source_title.'</a>';
+
+            $form_title = '';
+            foreach ( $forms as $form ) {
+                if ( $form[ 'id' ] == $form_id ) {
+                    $form_title = $form[ 'title' ];
+                    break;
+                }
+            }
+            
+            $data[] = [
+                'link'       => $entry_link,
+                'date'       => sanitize_text_field( $entry[ 'date_created' ] ),
+                'user'       => $user_display,
+                'form_title' => $form_title,
+                'form_id'    => $form_id,
+                'entry_id'   => $entry_id,
+                'source'     => $source_link,
             ];
-            $count_entries = GFAPI::count_entries( $form_id, $search_criteria );
-            $paging = [ 'offset' => 0, 'page_size' => $count_entries ];
-            $entries = GFAPI::get_entries( $form_id, $search_criteria, [], $paging );
-
-            // List them
-            foreach ( $entries as $entry ) {
-
-                $entry_id = intval( $entry[ 'id' ] );
-                
-                $entry_link = add_query_arg( [
-                    'page' => 'gf_entries',
-                    'view' => 'entry',
-                    'id'   => $form_id,
-                    'lid'  => $entry_id
-                ], admin_url( 'admin.php' ) );
-
-                $user_id = intval( $entry[ 'created_by' ] );
-                if ( $user_id && $user = get_userdata( $user_id ) ) {
-                    $user_display = $user->display_name;
-                } else {
-                    $user_display = __( 'Guest', 'gf-tools' );
-                }
-
-                $source_url = filter_var( $entry[ 'source_url' ], FILTER_SANITIZE_URL );
-                $source_title = $source_url;
-                if ( $post_id = url_to_postid( $source_url ) ) {
-                    $title = get_the_title( $post_id );
-                    if ( $title ) {
-                        $source_title = sanitize_text_field( $title );
-                    }
-                }
-                $source_link = '<a href="'.$source_url.'" target="_blank">'.$source_title.'</a>';
-                
-                $data[] = [
-                    'link'       => $entry_link,
-                    'date'       => sanitize_text_field( $entry[ 'date_created' ] ),
-                    'user'       => $user_display,
-                    'form_title' => $form_title,
-                    'form_id'    => $form_id,
-                    'entry_id'   => $entry_id,
-                    'source'     => $source_link,
-                ];
-            }
         }
 
         // Sort and cut

@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9
 Requires PHP: 7.4
 Tested up to: 6.8
-Stable tag: 1.0.6
+Stable tag: 1.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -104,6 +104,9 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.0.7 =
+* Fix: Recent entries causing timeouts when there are too many forms and entries
+
 = 1.0.6 =
 * Update: Updated author name and website again per WordPress trademark policy
 
