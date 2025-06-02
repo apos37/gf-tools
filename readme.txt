@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9
 Requires PHP: 7.4
 Tested up to: 6.8
-Stable tag: 1.0.7
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -53,7 +53,6 @@ Unlock advanced tools and customizations to supercharge your Gravity Forms exper
 
 === And Many More... ===
 - **Extensive Options:** Discover numerous additional features and settings.
-- **Community Requests:** Join our Discord server to request new settings and share feedback.
 
 == Third-Party Services ==
 This plugin constructs full URLs using the server's HTTP host and request URI. It defaults to `http://localhost` for local development environments.
@@ -89,7 +88,7 @@ Navigate to Forms > Settings > Advanced Tools. Scroll down to the Merge Tags sec
 Navigate to Forms > Settings > Advanced Tools. Scroll down to the For Developers section. Add a new field and enter the field label, meta key and field type. The field will then be added to all of your forms' settings. The form setting values are saved on the form object, and can be used in your custom queries.
 
 = Where can I request features and get further support? =
-Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
+We recommend using our [website support forum](https://pluginrx.com/support/plugin/gf-tools/) as the primary method for requesting features and getting help. You can also reach out via our [Discord support server](https://discord.gg/3HnzNEJVnR) or the [WordPress.org support forum](https://wordpress.org/support/plugin/gf-tools/), but please note that WordPress.org doesn’t always notify us of new posts, so it’s not ideal for time-sensitive issues.
 
 == Screenshots ==
 1. Global Search
@@ -104,6 +103,9 @@ Join my [Discord support server](https://discord.gg/3HnzNEJVnR)
 10. Entry Debugging
 
 == Changelog ==
+= 1.1.0 =
+* Update: New support links
+
 = 1.0.7 =
 * Fix: Recent entries causing timeouts when there are too many forms and entries
 

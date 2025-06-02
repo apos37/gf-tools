@@ -2681,17 +2681,12 @@ class GF_Advanced_Tools_Dashboard {
 
         <br><br><br><hr><br><br>
         <h2><?php echo esc_html__( 'Plugin Support', 'gf-tools' ); ?></h2>
-        <br><img src="<?php echo esc_url( GFADVTOOLS_PLUGIN_DIR.'includes/img/discord.png' ); ?>" width="auto" height="100">
-        <p><?php echo esc_html__( 'For fastest assistance with this plugin or have suggestions for improving it, please join my Discord server.', 'gf-tools' ); ?></p>
-        <a class="button button-primary" href="<?php echo esc_url( GFADVTOOLS_DISCORD_SUPPORT_URL ); ?>" target="_blank"><?php echo esc_html__( 'Join Our Support Server', 'gf-tools' ); ?> »</a><br>
-
-        <br>
-        <p><?php echo esc_html__( 'If you would rather get support on WordPress.org, you can do so here:', 'gf-tools' ); ?></p>
-        <a class="button button-primary" href="https://wordpress.org/support/plugin/gf-tools/" target="_blank"><?php echo esc_html__( 'WordPress.org Plugin Support Page', 'gf-tools' ); ?> »</a><br>
-
-        <br><br><br><hr><br><br>
         <?php
-        $HELPERS->apos37_plugin_links();
+        echo '<a class="button button-primary" href="'.esc_url( GFADVTOOLS_GUIDE_URL ).'" target="_blank">'.esc_html( __( 'How-To Guide', 'gf-tools' ) ).' »</a><br><br>';
+        echo '<a class="button button-primary" href="'.esc_url( GFADVTOOLS_DOCS_URL ).'" target="_blank">'.esc_html( __( 'Developer Docs', 'gf-tools' ) ).' »</a><br><br>';
+        echo '<a class="button button-primary" href="'.esc_url( GFADVTOOLS_SUPPORT_URL ).'" target="_blank">'.esc_html( __( 'Website Support Forum', 'gf-tools' ) ).' »</a><br><br>';
+        echo '<a class="button button-primary" href="'.esc_url( GFADVTOOLS_DISCORD_URL ).'" target="_blank">'.esc_html( __( 'Discord Support Server', 'gf-tools' ) ).' »</a><br><br>'; 
+        echo '<a class="button button-primary" href="https://wordpress.org/support/plugin/gf-tools/" target="_blank">'.esc_html( __( 'WordPress.org Plugin Support Page', 'gf-tools' ) ).' »</a><br><br>';
     } // End help()
 
 

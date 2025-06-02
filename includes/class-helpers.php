@@ -886,48 +886,6 @@ class GF_Advanced_Tools_Helpers {
 
 
     /**
-     * Get a list of our plugins
-     *
-     * @return void
-     */
-    public function apos37_plugin_links() {
-        $results = '<h2>'.__( 'Try My Other Plugins', 'gf-tools' ).'</h2>
-        <div class="apos37-plugins"><ul>';
-
-            $plugins = [
-                'gf-discord'           => 'Add-On for Discord and Gravity Forms',
-                'gf-msteams'           => 'Add-On for Microsoft Teams and Gravity Forms',
-                'admin-help-docs'      => 'Admin Help Docs',
-                'broken-link-notifier' => 'Broken Link Notifier',
-                'dev-debug-tools'      => 'Developer Debug Tools',
-            ];
-
-            $base_url = 'https://wordpress.org/plugins/';
-            foreach ( $plugins as $slug => $name ) {
-                $results .= '<li><a class="apos37-plugin" href="'.$base_url.$slug.'" target="_blank">'.$name.'</a></li>';
-            }
-
-        $results .= '</ul></div>';
-
-        $allowed_html = [
-            'h2'  => [],
-            'div' => [
-                'class'  => []
-            ],
-            'ul'  => [],
-            'li'  => [],
-            'a'   => [
-                'href'   => [],
-                'class'  => [],
-                'target' => [],
-                'style'  => []
-            ]
-        ];
-        echo wp_kses( $results, $allowed_html );
-    } // End apos37_plugin_links()
-
-
-    /**
      * Check if a string starts with something
      *
      * @param string $haystack
