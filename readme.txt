@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9
 Requires PHP: 7.4
 Tested up to: 6.8
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -103,6 +103,10 @@ We recommend using our [website support forum](https://pluginrx.com/support/plug
 10. Entry Debugging
 
 == Changelog ==
+= 1.1.1 =
+* Update: Added new Common Forms section to settings for mapping with additional functionality
+* Update: Added new mergetags - {site_name}, {domain_name}, {reset_password_url}
+
 = 1.1.0 =
 * Update: New support links
 

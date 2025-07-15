@@ -34,6 +34,17 @@
     margin-left: 5px;
 }
 
+/* Form/Page Pair */
+
+.form-page-pair {
+    display: flex;
+    align-items: center;
+}
+.form-page-pair .form-select,
+.form-page-pair .page-select {
+    flex: 1;
+}
+
 /* Text+ */
 
 .text-plus-row {

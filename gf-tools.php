@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name:         Advanced Tools for Gravity Forms
- * Plugin URI:          https://github.com/apos37/gf-tools
+ * Plugin URI:          https://pluginrx.com/plugin/gf-tools/
  * Description:         Unlock advanced tools to supercharge your Gravity Forms experience with enhanced features and streamlined management.
- * Version:             1.1.0
+ * Version:             1.1.1
  * Requires at least:   5.9
  * Tested up to:        6.8
  * Requires PHP:        7.4
@@ -46,6 +46,7 @@ define( 'GFADVTOOLS_PLUGIN_ROOT', plugin_dir_path( __FILE__ ) );                
 define( 'GFADVTOOLS_PLUGIN_DIR', plugins_url( '/'.GFADVTOOLS_TEXTDOMAIN.'/' ) );                                                // https://domain.com/wp-content/plugins/gf-tools/
 define( 'GFADVTOOLS_SETTINGS_URL', admin_url( 'admin.php?page=gf_settings&subview='.GFADVTOOLS_TEXTDOMAIN ) );                  // https://domain.com/wp-admin/admin.php?page=gf_settings&subview=gf-tools/
 define( 'GFADVTOOLS_DASHBOARD_URL', admin_url( 'admin.php?page='.GFADVTOOLS_TEXTDOMAIN ) );                                     // https://domain.com/wp-admin/admin.php?page=gf-tools
+define( 'GFADVTOOLS_FORMS_URL', GFADVTOOLS_PLUGIN_DIR . 'includes/forms/' );                                                    // https://domain.com/wp-content/plugins/gf-tools/includes/forms/
 define( 'GFADVTOOLS_AUTHOR_URL', $plugin_data[ 'author_uri' ] );
 define( 'GFADVTOOLS_GUIDE_URL', GFADVTOOLS_AUTHOR_URL . 'guide/plugin/' . GFADVTOOLS_TEXTDOMAIN . '/' );
 define( 'GFADVTOOLS_DOCS_URL', GFADVTOOLS_AUTHOR_URL . 'docs/plugin/' . GFADVTOOLS_TEXTDOMAIN . '/' );

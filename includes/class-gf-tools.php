@@ -73,6 +73,11 @@ class GF_Advanced_Tools extends GFAddOn {
             'shortcodes'      => 'Shortcodes',
             'form-display'    => 'Form_Display',
             'dashboard'       => 'Dashboard',
+            'login'           => 'Login',
+            'registration'    => 'Registration',
+            'password-reset'  => 'Password_Reset',
+            'pages'           => 'Pages',
+            'wp-login'        => 'WpLogin',
         ];
 
         foreach ( $classes as $file_name => $class ) {
@@ -333,6 +338,46 @@ class GF_Advanced_Tools extends GFAddOn {
             ];
         }
 
+        $forms = GFAPI::get_forms( null );
+        $form_choices = [
+            [
+                'label' => '— ' . __( 'Select a Form', 'gf-tools' ) . ' —',
+                'value' => ''
+            ]
+        ];
+        foreach ( $forms as $form ) {
+            $title = $form[ 'title' ];
+            if ( !$form[ 'is_active' ] ) {
+                $title .= ' ('.esc_html__( 'Inactive', 'gf-tools' ).')';
+            }
+            $form_choices[] = [
+                'label' => $title,
+                'value' => $form[ 'id' ]
+            ];
+        }
+
+        $download_nonce = wp_create_nonce( 'gfat_form_download' );
+
+        $pages = get_pages( [ 'post_status' => [ 'publish', 'draft', 'pending', 'private', 'future' ] ] );
+        $page_choices = [
+            [
+                'label' => '— ' . __( 'Select a Page', 'gf-tools' ) . ' —',
+                'value' => ''
+            ]
+        ];
+
+        foreach ( $pages as $page ) {
+            $label = $page->post_title;
+            if ( $page->post_status !== 'publish' ) {
+                $label .= ' (' . ucfirst( $page->post_status ) . ')';
+            }
+
+            $page_choices[] = [
+                'label' => $label,
+                'value' => $page->ID
+            ];
+        }
+
         if ( is_plugin_active( 'gravityformsquiz/quiz.php' ) ) {
             $incl_quiz_answers_panel = [
                 'type'    => 'checkbox',
@@ -417,6 +462,122 @@ class GF_Advanced_Tools extends GFAddOn {
                         'class'         => 'small',
                         'default_value' => '16.9',
                         'required'      => true
+                    ],
+                    [
+                        'type' => 'html',
+                        'name' => 'common_forms_section',
+                        'args' => [
+                            'html' => '<br><br><h2 id="common_forms">' . esc_html__( 'Common Forms', 'gf-tools' ) . '</h2>
+                            <p>' . esc_html__( 'If you are using Gravity Forms to create common forms like the ones listed below, you can map them here and have them automatically add additional logic to enhance them. Select the form and the page where your password reset form is embedded.', 'gf-tools' ) . '</p>'
+                        ],
+                    ],
+                    [
+                        'type'  => 'form_page_pair',
+                        'name'  => 'contact_mapping',
+                        'label' => esc_html__( 'Contact Form & Page', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=contact-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion. No additional functionality is applied.', 'gf-tools' ),
+                        'args'  => [
+                            'form' => [
+                                'name'    => 'contact_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'contact_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'  => 'form_page_pair',
+                        'name'  => 'registration_mapping',
+                        'label' => esc_html__( 'Registration Form & Page', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=registration-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion, along with other benefits. If you\'re using Gravity Forms with the User Registration add-on and want users to register with their email address as the username, this enables that logic automatically—only if an email field is mapped as the username in your feed. It does not affect forms that use a separate username field. This setting doesn’t create users by itself; you must still configure the User Registration add-on.', 'gf-tools' ),
+                        'args'  => [
+                            'form' => [
+                                'name'    => 'registration_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'registration_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'    => 'form_page_pair',
+                        'name'    => 'account_mapping',
+                        'label'   => esc_html__( 'Account Update Form & Page (For Logged-In Users)', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=account-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion. No additional functionality is applied.', 'gf-tools' ),
+                        'args'    => [
+                            'form' => [
+                                'name'    => 'account_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'account_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'    => 'form_page_pair',
+                        'name'    => 'password_change_mapping',
+                        'label'   => esc_html__( 'Password Change Form & Page (For Logged-In Users)', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=password-change-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion. No additional functionality is applied.', 'gf-tools' ),
+                        'args'    => [
+                            'form' => [
+                                'name'    => 'password_change_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'password_change_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'    => 'form_page_pair',
+                        'name'    => 'login_mapping',
+                        'label'   => esc_html__( 'Login Form & Page', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=login-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion, along with other benefits. If you are using Gravity Forms to create a custom login form (not via the User Registration add-on), this will add logic to authenticate users using the submitted credentials. Form must include email and password fields. If a checkbox or consent field with the input name "remember_me" is present, it will be supported.', 'gf-tools' ),
+                        'args'    => [
+                            'form' => [
+                                'name'    => 'login_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'login_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'    => 'form_page_pair',
+                        'name'    => 'password_reset_mapping',
+                        'label'   => esc_html__( 'Password Reset Form & Page (For Logged-Out Users)', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=password-reset-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion. This form should support both requesting a reset and setting a new password, based on the current action (see example form).', 'gf-tools' ),
+                        'args'    => [
+                            'form' => [
+                                'name'    => 'password_reset_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'password_reset_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
                     ],
                     [
                         'type' => 'html',
@@ -1308,6 +1469,54 @@ class GF_Advanced_Tools extends GFAddOn {
         $end_time_field = $field[ 'args' ][ 'end_time' ];
 		$this->settings_text( $end_time_field );
 	} // End settings_datetimes()
+
+
+    /**
+     * Define the markup for the form+page pair type field.
+     *
+     * @param array $field
+     * @param bool|true $echo
+     */
+    public function settings_form_page_pair( $field, $echo = true ) {
+        $args  = $field[ 'args' ];
+        $form  = $args[ 'form' ];
+        $page  = $args[ 'page' ];
+
+        $form_value = $this->get_setting( $form[ 'name' ] );
+        $page_value = $this->get_setting( $page[ 'name' ] );
+
+        ob_start();
+        ?>
+        <div class="form-page-pair" style="display: flex; gap: 10px;">
+            <div class="form-select" style="flex: 1;">
+                <select name="_gform_setting_<?php echo esc_attr( $form[ 'name' ] ); ?>" class="<?php echo esc_attr( $form[ 'class' ] ); ?>">
+                    <?php foreach ( $form[ 'choices' ] as $choice ) : ?>
+                        <option value="<?php echo esc_attr( $choice[ 'value' ] ); ?>" <?php selected( $form_value, $choice[ 'value' ] ); ?>>
+                            <?php echo esc_html( $choice[ 'label' ] ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="page-select" style="flex: 1;">
+                <select name="_gform_setting_<?php echo esc_attr( $page[ 'name' ] ); ?>" class="<?php echo esc_attr( $page[ 'class' ] ); ?>">
+                    <?php foreach ( $page[ 'choices' ] as $choice ) : ?>
+                        <option value="<?php echo esc_attr( $choice[ 'value' ] ); ?>" <?php selected( $page_value, $choice[ 'value' ] ); ?>>
+                            <?php echo esc_html( $choice[ 'label' ] ); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <?php
+
+        $html = ob_get_clean();
+
+        if ( $echo ) {
+            echo $html;
+        }
+
+        return $html;
+    } // End settings_form_page_pair()
 
 
     /**

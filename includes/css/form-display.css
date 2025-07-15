@@ -8,6 +8,21 @@
     margin-bottom: 2rem;
 }
 
+.gfadvtools-rp-notice {
+    background: #198754;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin-bottom: 2rem;
+}
+
+.gfield_validation_message {
+    background: #dc3545 !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 5px !important;
+}
+
 /* Review Page */
 
 .gfield_html .gfadvtools-review-form .please-review {
@@ -16,4 +31,13 @@
 
 .gfield_html .gfadvtools-review-form table {
     color: black !important;
+}
+
+/* Login Form Links */
+
+.gfadvtools-login-help-links {
+    flex-basis: 100% !important;
+    margin-top: 1em !important;
+    font-size: 0.875em !important;
+    text-align: center !important;
 }

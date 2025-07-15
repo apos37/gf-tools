@@ -64,6 +64,27 @@ class GF_Advanced_Tools_Merge_Tags {
                 'return_type' => 'text'
             ],
             [ 
+                'label'       => __( 'Site Name', 'gf-tools' ), 
+                'name'        => 'site_name', 
+                'value'       => get_bloginfo( 'name' ),
+                'field_type'  => null,
+                'return_type' => 'text'
+            ],
+            [ 
+                'label'       => __( 'Domain Name', 'gf-tools' ), 
+                'name'        => 'domain_name', 
+                'value'       => get_bloginfo( 'url' ),
+                'field_type'  => null,
+                'return_type' => 'text'
+            ],
+            [ 
+                'label'       => __( 'Reset Password URL', 'gf-tools' ), 
+                'name'        => 'reset_password_url', 
+                'value'       => wp_lostpassword_url(),
+                'field_type'  => null,
+                'return_type' => 'text'
+            ],
+            [ 
                 'label'       => __( 'Confirmation Signature', 'gf-tools' ), 
                 'name'        => 'confirmations_signature',
                 'value'       => 'confirmations_signature',

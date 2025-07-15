@@ -19,6 +19,14 @@ class GF_Advanced_Tools_Forms_Table {
 
 
     /**
+     * Store page mappings
+     *
+     * @var array
+     */
+    public $form_mappings;
+
+
+    /**
 	 * Constructor
 	 */
 	public function __construct( $plugin_settings ) {
@@ -48,6 +56,16 @@ class GF_Advanced_Tools_Forms_Table {
         if ( isset( $plugin_settings[ 'hide_conversion' ] ) && $plugin_settings[ 'hide_conversion' ] == 1 ) {
             add_filter( 'gform_form_list_columns', [ $this, 'hide_conversion' ], 10, 1 );
         }
+
+        // Mapped Form Titles
+        $this->get_mapped_forms();
+        add_filter( 'gform_form_list_forms', [ $this, 'add_form_state_labels' ], 10, 6 );
+
+        // Lock Mapped Forms
+        // add_filter( 'gform_form_trash_link', [ $this, 'remove_form_trash_link' ], 10, 2 );
+
+        // JQuery
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
 	} // End __construct()
 
@@ -172,4 +190,74 @@ class GF_Advanced_Tools_Forms_Table {
         unset( $columns[ 'conversion' ] );
         return $columns;
     } // End hide_conversion()
+
+
+    /**
+     * Get the mapped forms
+     *
+     * @return void
+     */
+    public function get_mapped_forms() {
+        $form_keys = [
+            'contact_form'         => __( 'Contact Form', 'gf-tools' ),
+            'registration_form'    => __( 'Registration Form', 'gf-tools' ),
+            'account_form'         => __( 'Account Update Form', 'gf-tools' ),
+            'password_change_form' => __( 'Password Change Form', 'gf-tools' ),
+            'login_form'           => __( 'Login Form', 'gf-tools' ),
+            'password_reset_form'  => __( 'Password Reset Form', 'gf-tools' ),
+        ];
+
+        foreach ( $form_keys as $key => $label ) {
+            $this->form_mappings[ $key ] = [
+                'id'    => isset( $this->plugin_settings[ $key ] ) ? absint( $this->plugin_settings[ $key ] ) : 0,
+                'label' => $label,
+            ];
+        }
+    } // End get_mapped_forms()
+
+
+    /**
+     * Add form states for mapped forms
+     *
+     * @param array $forms
+     * @return array
+     */
+    public function add_form_state_labels( $forms ) {
+        if ( empty( $this->form_mappings ) ) {
+            return $forms;
+        }
+
+        foreach ( $forms as $form ) {
+            foreach ( $this->form_mappings as $mapping ) {
+                if ( isset( $mapping[ 'id' ] ) && $mapping[ 'id' ] === (int) $form->id ) {
+                    $form->title .= ' — ' . esc_html( $mapping[ 'label' ] );
+                    
+                    break;
+                }
+            }
+        }
+
+        return $forms;
+    } // End add_form_state_labels()
+
+
+    /**
+     * Pass the mapped forms to the jQuery so we can remove the "Trash" links
+     *
+     * @param string $hook
+     */
+    public function enqueue_scripts( $hook ) {
+        // Check if we are on the correct admin page
+        if ( $hook !== 'toplevel_page_gf_edit_forms' ) {
+            return;
+        }
+
+        if ( wp_script_is( 'gfadvtools_forms_table', 'enqueued' ) ) {
+            wp_localize_script( 'gfadvtools_forms_table', 'gfat_forms_table', [
+                'mapped_forms' => $this->form_mappings,
+                'locked_by'    => esc_attr__( 'Locked by ', 'gf-tools' ) . esc_html( GFADVTOOLS_NAME )
+            ] );
+        }
+    } // End enqueue_scripts()
+
 }

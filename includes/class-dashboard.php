@@ -1765,12 +1765,39 @@ class GF_Advanced_Tools_Dashboard {
      * @return array
      */
     public function merge_tags_data( $user_id = false, $post_id = false, $entry = false, $form = null ) {
+        // GF docs base url
+        $docs_base_url = 'https://docs.gravityforms.com';
+
         // Defaults
         $sig_notice = '<em>The global signature you provide in Advanced Tools settings (see reference)</em>';
         $confirmations_sig = ( isset( $this->plugin_settings[ 'confirmations_signature' ] ) && $this->plugin_settings[ 'confirmations_signature' ] != '' ) ? wp_kses_post( $this->plugin_settings[ 'confirmations_signature' ] ) : $sig_notice;
         $notifications_sig = ( isset( $this->plugin_settings[ 'notifications_signature' ] ) && $this->plugin_settings[ 'notifications_signature' ] != '' ) ? wp_kses_post( $this->plugin_settings[ 'notifications_signature' ] ) : $sig_notice;
 
         $all_merge_tags = [
+            [ 
+                'label'   => __( 'Admin Email', 'gf-tools' ), 
+                'tag'     => '{admin_email}',
+                'returns'   => get_bloginfo( 'admin_email' ),
+                'ref'     => '<a href="'.$docs_base_url.'/admin-email-merge-tag/'.'" target="_blank">Gravity Forms Docs</a>'
+            ],
+            [ 
+                'label'   => __( 'Site Name', 'gf-tools' ), 
+                'tag'     => '{site_name}', 
+                'returns' => get_bloginfo( 'name' ),
+                'ref'     => 'Advanced Tools Plugin',
+            ],
+            [
+                'label'   => 'Domain Name',
+                'tag'     => '{domain_name}',
+                'returns' => get_bloginfo( 'url' ),
+                'ref'     => 'Advanced Tools Plugin',
+            ],
+            [
+                'label'   => 'Reset Password URL',
+                'tag'     => '{reset_password_url}',
+                'returns' => wp_lostpassword_url(),
+                'ref'     => 'Advanced Tools Plugin',
+            ],
             [
                 'label' => 'Confirmations Signature',
                 'tag'   => '{confirmations_signature}',
@@ -1818,7 +1845,6 @@ class GF_Advanced_Tools_Dashboard {
             'quiz'                      => '',
             'square_receipt_url'        => '',
             'apc_media'                 => '',
-            'admin_email'               => 'admin-email-merge-tag',
             'ip'                        => '',
             'referer'                   => '',
             'user_agent'                => '',
@@ -1845,9 +1871,6 @@ class GF_Advanced_Tools_Dashboard {
             'date_mdy'                  => 'category/user-guides/merge-tags-getting-started',
             'date_dmy'                  => 'category/user-guides/merge-tags-getting-started'
         ];
-
-        // GF docs base url
-        $docs_base_url = 'https://docs.gravityforms.com';
 
         // Get only the tags
         $tags = array_column( $all_merge_tags, 'tag' );
