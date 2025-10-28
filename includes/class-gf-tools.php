@@ -67,6 +67,7 @@ class GF_Advanced_Tools extends GFAddOn {
             'populate-fields' => 'Populate_Fields',
             'confirmations'   => 'Confirmations',
             'notifications'   => 'Notifications',
+            'validations'     => 'Validations',
             'developers'      => 'Developers',
             'mark-resolved'   => 'Mark_Resolved',
             'reports'         => 'Reports',

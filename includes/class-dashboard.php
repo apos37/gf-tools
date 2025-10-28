@@ -1300,8 +1300,8 @@ class GF_Advanced_Tools_Dashboard {
                 <div>
                     <label for="gfat-<?php echo esc_attr( $current_tab ); ?>-action"><?php echo esc_html__( 'Action', 'gf-tools' ); ?>:</label>
                     <select name="update[action]" id="gfat-<?php echo esc_attr( $current_tab ); ?>-action">
+                        <option value="deny"><?php echo esc_html__( 'Deny', 'gf-tools' ); ?></option>    
                         <option value="allow"><?php echo esc_html__( 'Allow', 'gf-tools' ); ?></option>
-                        <option value="deny"><?php echo esc_html__( 'Deny', 'gf-tools' ); ?></option>
                     </select>
                 </div>
                 <input type="submit" value="<?php echo esc_html__( 'Submit', 'gf-tools' ); ?>" id="gfat-<?php echo esc_attr( $current_tab ); ?>-search-button" class="button button-primary"/>

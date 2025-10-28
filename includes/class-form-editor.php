@@ -378,6 +378,24 @@ class GF_Advanced_Tools_Form_Editor {
                 'label'         => __( 'User Meta Key', 'gf-tools' ),
                 'tooltip'       => __( '<strong>User Meta Key</strong>If the user submitting the form is logged in, the value will be updated on the user\'s meta.', 'gf-tools' ),
             ],
+            [
+                'section'       => 'advanced_settings',
+                'position'      => -1,
+                'type'          => 'text',
+                'fields'        => [],
+                'id'            => 'validate',
+                'label'         => __( 'Validate', 'gf-tools' ),
+                'tooltip'       => __( '<strong>Validate</strong>Put the answer(s) here to validate user input. You may use merge tags. If there are multiple possibilities, separate them with a comma.', 'gf-tools' ),
+            ],
+            [
+                'section'       => 'advanced_settings',
+                'position'      => -1,
+                'type'          => 'text',
+                'fields'        => [],
+                'id'            => 'validate_message',
+                'label'         => __( 'Validation Message', 'gf-tools' ),
+                'tooltip'       => __( '<strong>Validation Message</strong>Put the message here to display when user input is invalid. If left blank, the validation will not be checked.', 'gf-tools' ),
+            ],
             // TODO: In a future version
             // [
             //     'section'       => 'advanced_settings',

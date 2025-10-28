@@ -132,6 +132,10 @@ class GF_Advanced_Tools_Login {
      * @return string
      */
     public function add_links_below_button( $button, $form ) {
+        if ( is_user_logged_in() ) {
+            return $button;
+        }
+
         $reset_url = wp_lostpassword_url();
         $links     = sprintf(
             '<div class="gfadvtools-login-help-links">
