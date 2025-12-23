@@ -3,8 +3,8 @@ Contributors: apos37
 Tags: report, spam, merge tags, search, schedule
 Requires at least: 5.9
 Requires PHP: 7.4
-Tested up to: 6.8
-Stable tag: 1.1.2
+Tested up to: 6.9
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -103,6 +103,9 @@ We recommend using our [website support forum](https://pluginrx.com/support/plug
 10. Entry Debugging
 
 == Changelog ==
+= 1.1.3 =
+* Update: Added option to redirect wp-login.php page in plugin settings under common forms
+
 = 1.1.2 =
 * Update: Added validation option to fields in the form editor
 

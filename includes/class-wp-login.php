@@ -27,6 +27,14 @@ class GF_Advanced_Tools_WpLogin {
 
 
     /**
+     * Are we redirecting the core login page?
+     *
+     * @var boolean
+     */
+    private $is_redirecting_core_login_page = false;
+
+
+    /**
 	 * Constructor
 	 */
 	public function __construct( $plugin_settings ) {
@@ -37,6 +45,9 @@ class GF_Advanced_Tools_WpLogin {
             $this->form_ids[ $option ] = isset( $plugin_settings[ $option . '_form' ] ) ? absint( $plugin_settings[ $option . '_form' ] ) : 0;
             $this->page_ids[ $option ] = isset( $plugin_settings[ $option . '_page' ] ) ? absint( $plugin_settings[ $option . '_page' ] ) : 0;
         }
+
+        // Are we redirecting the core login page?
+        $this->is_redirecting_core_login_page = isset( $plugin_settings[ 'core_login_redirect' ] ) ? (bool) $plugin_settings[ 'core_login_redirect' ] : false;
 
         // Registration
         add_action( 'update_option_users_can_register', [ $this, 'sync_registration_access' ], 10, 2 );
@@ -213,7 +224,7 @@ class GF_Advanced_Tools_WpLogin {
         }
 
         // Only redirect GET requests to custom login page for all other cases
-        if ( $this->is_enabled( 'login' ) && $_SERVER[ 'REQUEST_METHOD' ] === 'GET' ) {
+        if ( $this->is_redirecting_core_login_page && $this->is_enabled( 'login' ) && $_SERVER[ 'REQUEST_METHOD' ] === 'GET' ) {
             $url = $this->page_url( 'login' );
             if ( $url ) {
                 wp_safe_redirect( $url );

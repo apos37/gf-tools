@@ -296,31 +296,30 @@ class GF_Advanced_Tools_Login {
 
         // Priority 1: Get raw URL from query or entry
         $raw_url = '';
-        if ( isset( $_GET['redirect_to'] ) ) {
-            $raw_url = sanitize_url( wp_unslash( $_GET['redirect_to'] ) );
+        if ( isset( $_GET[ 'redirect_to' ] ) ) {
+            $raw_url = sanitize_url( wp_unslash( $_GET[ 'redirect_to' ] ) );
         } elseif ( $this->redirect_to_field_id ) {
             $raw_url = sanitize_url( rgar( $entry, $this->redirect_to_field_id ) );
         }
 
         if ( !empty( $raw_url ) ) {
             $redirect_to = urldecode( $raw_url );
-        }
 
-        // Get user for potential fallback and filtering
-        $user_email = sanitize_email( rgar( $entry, $this->email_field_id ) );
-        $user = $user_email ? get_user_by( 'email', $user_email ) : null;
+        } else {
+            // Get user for potential fallback and filtering
+            $user_email = sanitize_email( rgar( $entry, $this->email_field_id ) );
+            $user = $user_email ? get_user_by( 'email', $user_email ) : null;
 
-        if ( $user ) {
-            $access_admin = user_can( $user, 'read' ) && user_can( $user, 'access_admin' );
+            if ( $user ) {
+                $access_admin = user_can( $user, 'manage_options' );
 
-            // Priority 2: fallback only if redirect still not set
-            if ( !$redirect_to ) {
+                // Fallback
                 $redirect_to = $access_admin ? admin_url() : home_url();
-            }
 
-            // Apply final filter
-            $redirect_to = apply_filters( 'gfat_user_landing_page', $redirect_to, $user, $access_admin );
-        }
+                // Apply final filter
+                $redirect_to = apply_filters( 'gfat_user_landing_page', $redirect_to, $user, $access_admin );
+            }
+        }        
 
         // If still no redirect, fallback to login page
         if ( !$redirect_to && $this->page_id ) {

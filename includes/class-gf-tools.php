@@ -546,6 +546,24 @@ class GF_Advanced_Tools extends GFAddOn {
                     ],
                     [
                         'type'    => 'form_page_pair',
+                        'name'    => 'password_reset_mapping',
+                        'label'   => esc_html__( 'Password Reset Form & Page (For Logged-Out Users)', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=password-reset-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
+                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion. This form should support both requesting a reset and setting a new password, based on the current action (see example form).', 'gf-tools' ),
+                        'args'    => [
+                            'form' => [
+                                'name'    => 'password_reset_form',
+                                'class'   => 'small',
+                                'choices' => $form_choices,
+                            ],
+                            'page' => [
+                                'name'    => 'password_reset_page',
+                                'class'   => 'small',
+                                'choices' => $page_choices,
+                            ],
+                        ],
+                    ],
+                    [
+                        'type'    => 'form_page_pair',
                         'name'    => 'login_mapping',
                         'label'   => esc_html__( 'Login Form & Page', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=login-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
                         'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion, along with other benefits. If you are using Gravity Forms to create a custom login form (not via the User Registration add-on), this will add logic to authenticate users using the submitted credentials. Form must include email and password fields. If a checkbox or consent field with the input name "remember_me" is present, it will be supported.', 'gf-tools' ),
@@ -563,20 +581,14 @@ class GF_Advanced_Tools extends GFAddOn {
                         ],
                     ],
                     [
-                        'type'    => 'form_page_pair',
-                        'name'    => 'password_reset_mapping',
-                        'label'   => esc_html__( 'Password Reset Form & Page (For Logged-Out Users)', 'gf-tools' ) . ' — <a href="' . GFADVTOOLS_FORMS_URL . 'download.php?file=password-reset-form.json&_wpnonce=' . $download_nonce . '">' . esc_html__( 'Download Example Form', 'gf-tools' ) . '</a>',
-                        'tooltip' => esc_html__( 'This setting will lock the form and page to prevent accidental deletion. This form should support both requesting a reset and setting a new password, based on the current action (see example form).', 'gf-tools' ),
-                        'args'    => [
-                            'form' => [
-                                'name'    => 'password_reset_form',
-                                'class'   => 'small',
-                                'choices' => $form_choices,
-                            ],
-                            'page' => [
-                                'name'    => 'password_reset_page',
-                                'class'   => 'small',
-                                'choices' => $page_choices,
+                        'type'    => 'checkbox',
+                        'name'    => 'core_login_redirect_group',
+                        'label'   => esc_html__( 'Redirect the Core WordPress Login Page', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'This setting will redirect users away from the default WordPress login page to your custom login page if selected above.', 'gf-tools' ),
+                        'choices' => [
+                            [
+                                'label' => esc_html__( 'Yes', 'gf-tools' ),
+                                'name'  => 'core_login_redirect',
                             ],
                         ],
                     ],
