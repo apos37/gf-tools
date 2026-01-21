@@ -1819,19 +1819,36 @@ class GF_Advanced_Tools_Dashboard {
                 $label = sanitize_text_field( $gfat_tag[ 'label' ] );
                 $modifier = sanitize_text_field( $gfat_tag[ 'modifier' ] );
                 $value = sanitize_text_field( $gfat_tag[ 'value' ] );
-                if ( !$label || !$modifier ) {
+
+                if ( ! $label || ! $modifier ) {
                     continue;
                 }
+
                 if ( sanitize_key( $gfat_tag[ 'return_type' ] ) == 'callback' ) {
-                    $returns = __( 'Callback function:', 'gf-tools' ).'<br><code>'.$value.'</code>';
+
+                    // Check if the callback exists and is callable
+                    if ( is_callable( $value ) ) {
+                        try {
+                            $callback_result = call_user_func( $value, $form, $entry );
+
+                            $returns = __( 'Callback result:', 'gf-tools' ) . '<br><code>' . esc_html( (string) $callback_result ) . '</code>';
+
+                        } catch ( \Throwable $e ) {
+                            $returns = __( 'Callback error:', 'gf-tools' ) . '<br><code>' . esc_html( $e->getMessage() ) . '</code>';
+                        }
+                    } else {
+                        $returns = __( 'Callback function:', 'gf-tools' ) . '<br><code>' . esc_html( $value ) . '</code>';
+                    }
+
                 } else {
-                    $returns = '<code>'.$value.'</code>';
+                    $returns = '<code>' . esc_html( $value ) . '</code>';
                 }
+
                 $all_merge_tags[] = [
                     'label'   => $label,
-                    'tag'     => '{gfat:'.$modifier.'}',
+                    'tag'     => '{gfat:' . $modifier . '}',
                     'returns' => $returns,
-                    'ref'     => '<a href="'.GFADVTOOLS_SETTINGS_URL.'#merge_tags'.'">Merge Tag Settings</a>'
+                    'ref'     => '<a href="' . GFADVTOOLS_SETTINGS_URL . '#merge_tags">Merge Tag Settings</a>',
                 ];
             }
         }

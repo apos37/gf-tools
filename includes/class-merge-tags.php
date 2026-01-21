@@ -40,10 +40,10 @@ class GF_Advanced_Tools_Merge_Tags {
         $this->prepare();
 
         // Register the custom merge tags
-        add_filter( 'gform_custom_merge_tags', [ $this, 'register' ] );
+        add_filter( 'gform_custom_merge_tags', [ $this, 'register' ], 10, 4 );
 
-        // Replace the values of the merge tags
-        add_filter( 'gform_replace_merge_tags', [ $this, 'replace' ], 10, 3 );
+        // Replace the values of the merge tags. Request all args to match GF's filter signature.
+        add_filter( 'gform_replace_merge_tags', [ $this, 'replace' ], 10, 7 );
 
 	} // End __construct()
 
@@ -138,7 +138,8 @@ class GF_Advanced_Tools_Merge_Tags {
      * @param [type] $element_id
      * @return array
      */
-    public function register( $merge_tags ) {
+    public function register( $merge_tags, $form = null, $fields = null, $element_id = null ) {
+
         foreach ( $this->merge_tags as $merge_tag ) {
             $merge_tags[] = [
                 'label' => $merge_tag[ 'label' ],
@@ -161,7 +162,7 @@ class GF_Advanced_Tools_Merge_Tags {
      * @param string $format
      * @return string
      */
-    public function replace( $text, $form, $entry ) {
+    public function replace( $text, $form = null, $entry = null, $url_encode = false, $esc_html = true, $nl2br = true, $format = '' ) {
         // Check form settings for an associated/connected post
         $post_id = false;
         $query_string = false;
@@ -179,102 +180,101 @@ class GF_Advanced_Tools_Merge_Tags {
         $post = false;
         $post_object_keys = false;
 
-        // Iter the tags
+        // Ensure merge tags have a sensible default return type
+        foreach ( $this->merge_tags as $k => $mt ) {
+            if ( !isset( $this->merge_tags[ $k ][ 'return_type' ] ) || $this->merge_tags[ $k ][ 'return_type' ] === '' ) {
+                $this->merge_tags[ $k ][ 'return_type' ] = 'text';
+            }
+        }
+
+        // Build replacements in bulk for normal tags (non-connection)
+        $search = [];
+        $replace = [];
         foreach ( $this->merge_tags as $merge_tag ) {
-            
-            // Normal merge tags
-            $merge_tag_code = '{'.$merge_tag[ 'name' ].'}';
-            if ( strpos( $text, $merge_tag_code ) !== false ) {
-                
-                // Straight text value
-                if ( $merge_tag[ 'return_type' ] == 'text' ) {
-                    $value = $merge_tag[ 'value' ];
-                    $text = str_replace( $merge_tag_code, $value, $text );
+            // Skip connection-style tags here; they are handled separately below
+            if ( isset( $merge_tag['name'] ) && strpos( $merge_tag['name'], 'connection:' ) === 0 ) {
+                continue;
+            }
 
-                // Plugin setting
-                } elseif ( $merge_tag[ 'return_type' ] == 'plugin_setting' ) {
-                    $setting = $merge_tag[ 'value' ];
+            $merge_tag_code = '{' . $merge_tag['name'] . '}';
+            $value = '';
+
+            switch ( $merge_tag['return_type'] ) {
+                case 'plugin_setting':
+                    $setting = $merge_tag['value'];
                     if ( isset( $this->plugin_settings[ $setting ] ) ) {
-                        $field_type = $merge_tag[ 'field_type' ];
-                        if ( $field_type == 'textarea' ) {
-                            $value = sanitize_textarea_field( $this->plugin_settings[ $setting ] );
-                        } else {
-                            $value = sanitize_text_field( $this->plugin_settings[ $setting ] );
-                        }
-                        $text = str_replace( $merge_tag_code, $value, $text );
+                        $field_type = isset( $merge_tag['field_type'] ) ? $merge_tag['field_type'] : '';
+                        $value = ( $field_type == 'textarea' ) ? sanitize_textarea_field( $this->plugin_settings[ $setting ] ) : sanitize_text_field( $this->plugin_settings[ $setting ] );
                     }
-
-                // Form setting
-                } elseif ( $merge_tag[ 'return_type' ] == 'form_setting' ) {
-                    $setting = $merge_tag[ 'value' ];
+                    break;
+                case 'form_setting':
+                    $setting = $merge_tag['value'];
                     if ( isset( $this->form_settings[ $setting ] ) ) {
-                        $field_type = $merge_tag[ 'field_type' ];
-                        if ( $field_type == 'textarea' ) {
-                            $value = sanitize_textarea_field( $this->form_settings[ $setting ] );
-                        } else {
-                            $value = sanitize_text_field( $this->form_settings[ $setting ] );
-                        }
-                        $text = str_replace( $merge_tag_code, $value, $text );
+                        $field_type = isset( $merge_tag['field_type'] ) ? $merge_tag['field_type'] : '';
+                        $value = ( $field_type == 'textarea' ) ? sanitize_textarea_field( $this->form_settings[ $setting ] ) : sanitize_text_field( $this->form_settings[ $setting ] );
                     }
+                    break;
+                case 'callback':
+                    $callback = $merge_tag['value'];
+                    if ( is_callable( $callback ) ) {
+                        try {
+                            $raw = call_user_func( $callback, $form, $entry );
+                            $value = wp_kses_post( $raw );
+                        } catch ( Exception $e ) {
+                            // swallow exception to avoid breaking replacements
+                        }
+                    }
+                    break;
+                case 'text':
+                default:
+                    $value = isset( $merge_tag['value'] ) ? $merge_tag['value'] : '';
+                    break;
+            }
 
-                // Callback
-                } elseif ( $merge_tag[ 'return_type' ] == 'callback' ) {
-                    $callback = $merge_tag[ 'value' ];
-                    if ( function_exists( $callback ) ) {
-                        $value = wp_kses_post( $callback( $form, $entry ) );
-                        $text = str_replace( $merge_tag_code, $value, $text );
+            $search[] = $merge_tag_code;
+            $replace[] = $value;
+        }
+
+        if ( !empty( $search ) ) {
+            $text = str_replace( $search, $replace, $text );
+        }
+
+        // Connections: replace {connection:meta_key} tags if we have a connected post
+        if ( preg_match_all( '/\{connection:([a-zA-Z0-9_]+)\}/', $text, $matches ) ) {
+            // Only continue if the form has a connection set
+            if ( $post_id || $query_string ) {
+                // If query string, let's attempt to get the post id from the query string
+                if ( !$post_id && $query_string ) {
+                    if ( isset( $_GET[ $query_string ] ) && absint( $_GET[ $query_string ] ) > 0 ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                        $post_id = absint( $_GET[ $query_string ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                     }
                 }
 
-            // Connections
-            } elseif ( preg_match_all( '/\{connection:([a-zA-Z0-9_]+)\}/', $text, $matches ) ) {
-                
-                // Only continue if the form has a connection set
-                if ( $post_id || $query_string ) {
-                    
-                    // If query string, let's attempt to get the post id from the query string
-                    if ( !$post_id && $query_string ) {
-                        if ( isset( $_GET[ $query_string ] ) && absint( $_GET[ $query_string ] ) > 0 ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                            $post_id = absint( $_GET[ $query_string ] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-                        }
+                // Validate we have a post id
+                if ( $post_id ) {
+                    if ( !$post ) {
+                        $post = get_post( $post_id );
                     }
-    
-                    // Validate we have a post id
-                    if ( $post_id ) {
 
-                        // If no post is set, attempt to set it
-                        if ( !$post ) {
-                            $post = get_post( $post_id );
+                    if ( $post ) {
+                        if ( !$post_object_keys ) {
+                            $post_object_keys = array_keys( get_object_vars( $post ) );
                         }
-    
-                        // Validate we have a post
-                        if ( $post ) {
 
-                            // Save the post object vars
-                            if ( !$post_object_keys ) {
-                                $post_object_keys = array_keys( get_object_vars( $post ) );
-                            }
-
-                            // Now check each meta key found
-                            foreach ( $matches[1] as $meta_key ) {
-                                
-                                // Get the value
-                                $meta_value = '';
-                                if ( in_array( $meta_key, $post_object_keys ) ) {
-                                    $meta_value = isset( $post->$meta_key ) ? sanitize_text_field( $post->$meta_key ) : '';
-
+                        foreach ( $matches[1] as $meta_key ) {
+                            $meta_value = '';
+                            if ( in_array( $meta_key, $post_object_keys ) ) {
+                                $meta_value = isset( $post->$meta_key ) ? sanitize_text_field( $post->$meta_key ) : '';
+                            } else {
+                                $get_value = get_post_meta( $post_id, $meta_key, true );
+                                if ( $get_value !== '' && $get_value !== false ) {
+                                    $meta_value = sanitize_text_field( $get_value );
                                 } else {
-                                    $get_value = get_post_meta( $post_id, $meta_key, true );
-                                    if ( $get_value !== '' && $get_value !== false ) {
-                                        $meta_value = sanitize_text_field( $get_value );
-                                    } else {
-                                        $meta_value = '[Meta Key "'.$meta_key.'" Does Not Exist]';
-                                    }
+                                    $meta_value = '[Meta Key "' . $meta_key . '" Does Not Exist]';
                                 }
-
-                                // Replace
-                                $text = str_replace( '{connection:'.$meta_key.'}', $meta_value, $text );
                             }
+
+                            $text = str_replace( '{connection:' . $meta_key . '}', $meta_value, $text );
                         }
                     }
                 }

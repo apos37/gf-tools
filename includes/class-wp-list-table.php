@@ -116,12 +116,20 @@ class GF_Advanced_Tools_WP_List_Table extends WP_List_Table {
         ) . '</span>';
     
         $current              = $this->get_pagenum();
-        $removable_query_args = wp_removable_query_args();
-        $removable_query_args[] = 'delete';
-    
-        $current_url = (new GF_Advanced_Tools_Helpers)->get_current_url();
-    
-        $current_url = remove_query_arg( $removable_query_args, $current_url );
+        
+        $current_url = admin_url( 'admin.php' );
+        $query_args  = [
+            'page' => GFADVTOOLS_TEXTDOMAIN,
+            'tab'  => isset( $_GET[ 'tab' ] ) ? sanitize_text_field( wp_unslash( $_GET[ 'tab' ] ) ) : '',
+        ];
+
+        foreach ( $_GET as $key => $value ) {
+            if ( ! in_array( $key, [ 'paged', 'page', 'tab' ] ) ) {
+                $query_args[ $key ] = wp_unslash( $value );
+            }
+        }
+
+        $current_url = add_query_arg( $query_args, $current_url );
     
         $page_links = [];
     
