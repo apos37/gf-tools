@@ -71,8 +71,10 @@ class GF_Advanced_Tools extends GFAddOn {
             'developers'      => 'Developers',
             'mark-resolved'   => 'Mark_Resolved',
             'reports'         => 'Reports',
+            'graphs'          => 'Graphs',
             'shortcodes'      => 'Shortcodes',
             'form-display'    => 'Form_Display',
+            'fillable-pdfs'   => 'Fillable_PDFs',
             'dashboard'       => 'Dashboard',
             'login'           => 'Login',
             'registration'    => 'Registration',
@@ -87,7 +89,9 @@ class GF_Advanced_Tools extends GFAddOn {
                 require_once $file_path;
                 if ( $class ) {
                     $full_class_name = 'GF_Advanced_Tools_' . $class;
-                    new $full_class_name( $plugin_settings, $form_settings, $form_id );
+                    if ( class_exists( $full_class_name ) ) {
+                        new $full_class_name( $plugin_settings, $form_settings, $form_id );
+                    }
                 }
             }
         }
@@ -238,9 +242,14 @@ class GF_Advanced_Tools extends GFAddOn {
             'shortcodes'      => [ 'label' => 'Shortcodes' ],
             'merge_tags'      => [ 'label' => 'Merge Tags' ],
             'pre_populate'    => [ 'label' => 'Pre-Populate Fields' ],
-            'settings'        => [ 'label' => 'Settings' ],
-            'help'            => [ 'label' => 'Help' ],
         ];
+
+        if ( is_plugin_active( 'forgravity-fillablepdfs/fillablepdfs.php' ) ) {
+            $tabs[ 'fillable_pdfs' ] = [ 'label' => 'Fillable PDFs' ];
+        }
+
+        $tabs[ 'settings' ] = [ 'label' => 'Settings' ];
+        $tabs[ 'help' ]     = [ 'label' => 'Help' ];
 
         // Dashboard url
         $dashboard_url = add_query_arg( 'tab', 'global_search', GFADVTOOLS_DASHBOARD_URL );
@@ -439,6 +448,11 @@ class GF_Advanced_Tools extends GFAddOn {
             if ( isset( $_POST[ '_gform_setting_exclude_bom' ] ) ) {
                 $exclude_bom = filter_var( wp_unslash( $_POST['_gform_setting_exclude_bom'] ), FILTER_VALIDATE_BOOLEAN );
                 update_option( 'gfat_export_exclude_bom', $exclude_bom );
+            }
+
+            if ( isset( $_POST[ '_gform_setting_combine_multiple_input_cols' ] ) ) {
+                $combine_multiple_input_cols = filter_var( wp_unslash( $_POST['_gform_setting_combine_multiple_input_cols'] ), FILTER_VALIDATE_BOOLEAN );
+                update_option( 'gfat_export_combine_multiple_input_cols', $combine_multiple_input_cols );
             }
         }
 
@@ -896,6 +910,18 @@ class GF_Advanced_Tools extends GFAddOn {
                         'name' => 'exporting_section',
                         'args' => [
                             'html' => '<br><br><h2 id="exporting">Exporting</h2>'
+                        ],
+                    ],
+                    [
+                        'type'    => 'checkbox',
+                        'name'    => 'combine_multiple_input_cols_group',
+                        'label'   => esc_html__( 'Combine Multiple Input Columns in Export Files', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'When enabled, multiple input columns such as checkboxes will be combined into a single column in the export files.', 'gf-tools' ),
+                        'choices' => [
+                            [
+                                'label' => esc_html__( 'Yes', 'gf-tools' ),
+                                'name'  => 'combine_multiple_input_cols',
+                            ],
                         ],
                     ],
                     [

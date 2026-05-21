@@ -469,37 +469,28 @@ class GF_Advanced_Tools_Helpers {
      */
     public function get_current_url( $params = true, $domain = true ) {
         if ( $domain === true ) {
-            // Check if HTTP_HOST is set before using it
-            if ( isset( $_SERVER[ 'HTTP_HOST' ] ) ) {
-                $protocol = isset( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] !== 'off' ? 'https' : 'http';
-                $domain_without_protocol = sanitize_text_field( wp_unslash( $_SERVER[ 'HTTP_HOST' ] ) );
-                $domain = $protocol.'://'.$domain_without_protocol;
-            } else {
-                // Handle case where HTTP_HOST is not set
-                $domain = 'http://localhost';
-            }
-    
+            $protocol = is_ssl() ? 'https' : 'http';
+            $host = isset( $_SERVER[ 'HTTP_HOST' ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ 'HTTP_HOST' ] ) ) : 'localhost';
+            $domain = $protocol . '://' . $host;
         } elseif ( $domain === 'only' ) {
-            // Check if HTTP_HOST is set before using it
-            if ( isset( $_SERVER[ 'HTTP_HOST' ] ) ) {
-                $domain = sanitize_text_field( wp_unslash( $_SERVER[ 'HTTP_HOST' ] ) );
-                return $domain;
-            } else {
-                return 'localhost';
-            }
-    
+            return isset( $_SERVER[ 'HTTP_HOST' ] ) ? sanitize_text_field( wp_unslash( $_SERVER[ 'HTTP_HOST' ] ) ) : 'localhost';
         } else {
             $domain = '';
         }
-    
-        $uri = filter_input( INPUT_SERVER, 'REQUEST_URI', FILTER_SANITIZE_URL );
-        $full_url = $domain.$uri;
-    
-        if ( !$params ) {
-            return strtok( $full_url, '?' );
-        } else {
-            return $full_url;
+
+        // Get the current page URL reliably
+        $uri = add_query_arg( null, null );
+        $full_url = $domain . parse_url( $uri, PHP_URL_PATH );
+
+        if ( $params ) {
+            // Re-add current query string if requested
+            $query = wp_parse_url( $uri, PHP_URL_QUERY );
+            if ( $query ) {
+                $full_url .= '?' . $query;
+            }
         }
+
+        return esc_url_raw( $full_url );
     } // End get_current_url()
     
 
@@ -921,4 +912,21 @@ class GF_Advanced_Tools_Helpers {
         }
         return '';
     } // End administrator_error_message()
+
+
+    /**
+     * Format bytes into a human-readable string with appropriate units
+     *
+     * @param int $bytes
+     * @return string
+     */
+    public function format_precise_size( $bytes ) {
+        if ( $bytes <= 0 ) {
+            return '0 B';
+        }
+        $units = [ 'B', 'KB', 'MB', 'GB', 'TB' ];
+        $i     = floor( log( $bytes, 1024 ) );
+        return round( $bytes / pow( 1024, $i ), 2 ) . ' ' . $units[ $i ];
+    } // End format_precise_size()
+    
 }

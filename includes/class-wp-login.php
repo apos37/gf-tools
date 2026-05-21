@@ -147,10 +147,23 @@ class GF_Advanced_Tools_WpLogin {
      * @return string
      */
     public function filter_login_url( $login_url, $redirect, $force_reauth ) {
-        $url = $this->page_url( 'login' );
-        if ( $url && $redirect ) {
-            $url = add_query_arg( 'redirect_to', urlencode( $redirect ), $url );
+        if (
+            ( isset( $_REQUEST[ 'action' ] ) && in_array( $_REQUEST[ 'action' ], [ 'confirm_admin_email', 'lostpassword', 'resetpass', 'rp' ], true ) )
+            || ( $redirect && strpos( (string) $redirect, 'wp-admin' ) !== false )
+        ) {
+            return $login_url;
         }
+
+        $url = $this->page_url( 'login' );
+
+        if ( $url && $redirect ) {
+            $url = add_query_arg( 'redirect_to', rawurlencode( $redirect ), $url );
+        }
+
+        if ( $url && $force_reauth ) {
+            $url = add_query_arg( 'reauth', '1', $url );
+        }
+
         return $url ?: $login_url;
     } // End filter_login_url()
 
@@ -220,6 +233,11 @@ class GF_Advanced_Tools_WpLogin {
 
         // Allow logout action without redirect
         if ( $action === 'logout' ) {
+            return;
+        }
+
+        // Allow confirm_admin_email action
+        if ( $action === 'confirm_admin_email' ) {
             return;
         }
 

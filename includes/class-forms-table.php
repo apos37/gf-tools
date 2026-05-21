@@ -129,7 +129,7 @@ class GF_Advanced_Tools_Forms_Table {
         if ( isset( $form[ 'created_by' ] ) ) {
             $created_by_id = absint( $form[ 'created_by' ] );
             $created_by_user = get_user_by( 'ID', $created_by_id );
-            $incl_created_by = ' by '.$created_by_user->display_name;
+            $incl_created_by = $created_by_user ? ' by '.$created_by_user->display_name : '';
         } else {
             $incl_created_by = '';
         }
@@ -140,7 +140,7 @@ class GF_Advanced_Tools_Forms_Table {
             if ( isset( $form[ 'modified_by' ] ) ) {
                 $modified_by_id = absint( $form[ 'modified_by' ] );
                 $modified_by_user = get_user_by( 'ID', $modified_by_id );
-                $incl_modified_by = ' by '.$modified_by_user->display_name;
+                $incl_modified_by = $modified_by_user ? ' by '.$modified_by_user->display_name : '';
             } else {
                 $incl_modified_by = '';
             }

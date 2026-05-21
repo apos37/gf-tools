@@ -556,6 +556,76 @@ form#gfat-merge_tags-form .search-field:not(:last-of-type) {
     background-color: #fafafa;
 }
 
+/* Fillable PDFs */
+
+#gfat_fillable_pdfs_content .gfat-header-columns {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 60px;
+    align-items: stretch;
+}
+
+#gfat_fillable_pdfs_content .gfat-column-summary {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+}
+
+#gfat_fillable_pdfs_content .gfat-column-summary h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+#gfat_fillable_pdfs_content .gfat-column-tools {
+    flex: 2;
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#gfat_fillable_pdfs_content .gfat-tool-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+#gfat_fillable_pdfs_content .gfat-schedule-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+#gfat_fillable_pdfs_content .gfat-tool-row label {
+    font-weight: 600;
+}
+
+#gfat_fillable_pdfs_content #gfat-ajax-response {
+    margin-top: 10px;
+    font-weight: bold;
+    display: block;
+}
+
+#gfat_fillable_pdfs_content .gfat-tool-row button {
+    height: 44px !important;
+}
+
+#gfat_fillable_pdfs_content #gfat-deep-clean-pdfs {
+    background: #dc3232;
+    color: white;   
+}
+
+#gfat_fillable_pdfs_content .column-form_id,
+#gfat_fillable_pdfs_content .column-status,
+#gfat_fillable_pdfs_content .column-count,
+#gfat_fillable_pdfs_content .column-size { width: 80px; }
+
 /* Other */
 
 #gfat-tab-content .reference {

@@ -97,7 +97,8 @@ class GF_Advanced_Tools_Spam {
             add_filter( 'gform_field_validation', [ $this, 'block_blacklist' ], 10, 4 );
             
             // Allow items that are otherwise marked as spam, and double check blacklisted items if manually set to true
-            add_filter( 'gform_entry_is_spam', [ $this, 'filter_spam' ], 9999, 3 ); 
+            $priority = apply_filters( 'gfadvtools_spam_filter_priority', 9999 );
+            add_filter( 'gform_entry_is_spam', [ $this, 'filter_spam' ], $priority, 3 );
         }
 
         // Block links
@@ -1454,7 +1455,7 @@ class GF_Advanced_Tools_Spam {
                 return $is_spam;
             }
         }
-        if ( empty( $spam_records ) ) {
+        if ( empty( $spam_records ) || empty( $spam_records[ 'results' ] ) ) {
             return $is_spam;
         }
 
@@ -1469,11 +1470,11 @@ class GF_Advanced_Tools_Spam {
 
             $record_action = $record[ 'action' ];
 
-            if ( !$double_check_denied &&  $record_action === 'deny' ) {
+            if ( !$double_check_denied && $record_action === 'deny' ) {
                 continue; // Skip denied records if double_check_denied is false
             }
 
-            $action =  $record_action === 'allow';
+            $action = $record_action === 'allow';
             $record_value = $record[ 'value' ];
             switch ( $record[ 'type' ] ) {
                 case 'email':
@@ -1492,8 +1493,8 @@ class GF_Advanced_Tools_Spam {
         $disable_word_boundaries = isset( $plugin_settings[ 'disable_word_boundaries' ] ) && $plugin_settings[ 'disable_word_boundaries' ] == 1;
 
         // Initialize spam status flags
-        $is_spam = false;
-        $is_allowed = false;
+        $found_match = false;
+        $match_is_allowed = false;
         $log_message = '';
 
         // Process each field
@@ -1525,15 +1526,15 @@ class GF_Advanced_Tools_Spam {
                 
                 // Check email and domain actions
                 if ( $is_email && isset( $email_actions[ $value ] ) ) {
-                    $is_spam = !$email_actions[ $value ];
+                    $found_match      = true;    
+                    $match_is_allowed = $email_actions[ $value ];
                     $log_message = "Email '$value' matched with action '" . ( $email_actions[ $value ] ? 'allow' : 'deny' ) . "'.";
                     break;
                 } elseif ( isset( $domain_actions[ $domain ] ) ) {
-                    $is_spam = !$domain_actions[ $domain ];
+                    $found_match      = true;
+                    $match_is_allowed = $domain_actions[ $domain ];
                     $log_message = "Domain '$domain' matched with action '" . ( $domain_actions[ $domain ] ? 'allow' : 'deny' ) . "'.";
                     break;
-                } else {
-                    $is_allowed = true;
                 }
 
             } else {
@@ -1545,7 +1546,8 @@ class GF_Advanced_Tools_Spam {
                         : '/\b' . preg_quote( $keyword, '/' ) . '\b/i';
 
                     if ( preg_match( $pattern, $value ) ) {
-                        $is_spam = !$allowed;
+                        $found_match      = true;
+                        $match_is_allowed = $allowed;
                         $log_message = "Keyword '$keyword' found in $type field with action '" . ( $allowed ? 'allow' : 'deny' ) . "'.";
                         break 2;
                     }
@@ -1553,7 +1555,8 @@ class GF_Advanced_Tools_Spam {
 
                 foreach ( $domain_actions as $domain => $allowed ) {
                     if ( stripos( $value, $domain ) !== false ) {
-                        $is_spam = !$allowed;
+                        $found_match      = true;
+                        $match_is_allowed = $allowed;
                         $log_message = "Domain '$domain' found in $type field with action '" . ( $allowed ? 'allow' : 'deny' ) . "'.";
                         break 2;
                     }
@@ -1561,7 +1564,8 @@ class GF_Advanced_Tools_Spam {
 
                 foreach ( $email_actions as $email => $allowed ) {
                     if ( stripos( $value, $email ) !== false ) {
-                        $is_spam = !$allowed;
+                        $found_match      = true;
+                        $match_is_allowed = $allowed;
                         $log_message = "Email '$email' found in $type field with action '" . ( $allowed ? 'allow' : 'deny' ) . "'.";
                         break 2;
                     }
@@ -1570,8 +1574,9 @@ class GF_Advanced_Tools_Spam {
         }
 
         // Determine final spam status
-        if ( $is_allowed ) {
-            $is_spam = false;
+        if ( $found_match ) {
+            // We found a specific rule in our list, so we OVERRIDE whatever was there before
+            $is_spam = ! $match_is_allowed;
         }
 
         if ( $log_message ) {

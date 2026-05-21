@@ -45,3 +45,53 @@
     padding: 7px;
     display: block;
 }
+
+/* Graphs */
+
+.gfat-graph-title-wrap {
+    width: 100%;
+}
+
+.gfat-graph-container {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 30px;
+    font-family: sans-serif;
+}
+
+/* Bar Chart */
+.gfat-bar-row { margin-bottom: 15px; }
+.gfat-bar-info { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.gfat-bar-track { background: #eee; height: 20px; border-radius: 10px; overflow: hidden; }
+.gfat-bar-fill { height: 100%; transition: width 0.5s ease-in-out; }
+
+/* Pie Chart */
+.gfat-pie-wrapper { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+.gfat-pie-circle { 
+    width: 200px; 
+    height: 200px; 
+    border-radius: 50%; 
+    border: 1px solid #ddd;
+}
+.gfat-graph-legend { list-style: none; padding: 0; margin: 0; }
+.gfat-legend-item { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; font-size: 14px; }
+.gfat-legend-swatch { width: 14px; height: 14px; margin-right: 10px; border-radius: 2px; }
+
+/* Line/Spline Chart */
+.gfat-svg-wrapper {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.gfat-inline-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px !important;
+}
+
+.gfat-inline-legend .gfat-legend-item {
+    font-size: 12px;
+}

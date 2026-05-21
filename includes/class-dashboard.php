@@ -2661,6 +2661,161 @@ class GF_Advanced_Tools_Dashboard {
 
 
     /**
+     * Fillable PDFs
+     *
+     * @return void
+     */
+    public function fillable_pdfs() {
+        if ( ! function_exists( 'fg_fillablepdfs' ) ) {
+            echo '<div class="notice notice-error"><p>' . esc_html__( 'Fillable PDFs plugin is not active.', 'gf-tools' ) . '</p></div>';
+            return;
+        }
+
+        $HELPERS = new GF_Advanced_Tools_Helpers();
+
+        // Handle Save Schedule Post
+        if ( isset( $_POST[ 'gfat_save_pdf_settings' ] ) && check_admin_referer( 'gfat_pdf_nonce_action', 'gfat_pdf_nonce' ) ) {
+            $schedule = isset( $_POST[ 'gfat_pdf_schedule' ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'gfat_pdf_schedule' ] ) ) : 'none';
+            update_option( 'gfat_pdf_schedule', $schedule );
+            ( new GF_Advanced_Tools_Fillable_PDFs() )->update_cleanup_schedule( $schedule );
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Schedule saved successfully.', 'gf-tools' ) . '</p></div>';
+        }
+
+        $last_run_raw = get_option( 'gfat_last_pdf_cleanup_time' );
+    
+        $is_deep_clean_allowed = ( $last_run_raw && ( time() - $last_run_raw ) <= DAY_IN_SECONDS );
+        $deep_clean_attr       = $is_deep_clean_allowed ? '' : 'disabled';
+        $deep_clean_title      = $is_deep_clean_allowed 
+            ? __( 'Deletes orphaned files from disk over 30 days old.', 'gf-tools' ) 
+            : __( 'Locked: Run "Clear All Connected PDFs" first to unlock.', 'gf-tools' );
+        
+        $last_run_display = $last_run_raw ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $last_run_raw ) : __( 'Never', 'gf-tools' );
+        $next_run_timestamp = wp_next_scheduled( 'gfat_cron_clear_fillable_pdfs' );
+        $next_run_display   = $next_run_timestamp ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_run_timestamp ) : __( 'Not Scheduled', 'gf-tools' );
+
+        $forms             = GFAPI::get_forms( true, false );
+        $all_form_data     = [];
+        $grand_total_size  = 0;
+        $grand_total_count = 0;
+
+        foreach ( $forms as $form ) {
+            $form_id   = absint( $form[ 'id' ] );
+            $form_path = fg_fillablepdfs()::get_form_pdf_path( $form_id );
+            
+            // We want to show the path relative to the uploads folder for readability
+            $relative_path = str_replace( wp_upload_dir()['basedir'], '', $form_path );
+
+            $stats = [ 'count' => 0, 'size' => 0 ];
+            
+            if ( is_dir( $form_path ) ) {
+                $directory = new RecursiveDirectoryIterator( $form_path, RecursiveDirectoryIterator::SKIP_DOTS );
+                $iterator  = new RecursiveIteratorIterator( $directory );
+
+                foreach ( $iterator as $file ) {
+                    // Strictly counting only PDFs
+                    if ( $file->isFile() && $file->getExtension() === 'pdf' ) {
+                        $stats[ 'count' ]++;
+                        $stats[ 'size' ] += $file->getSize();
+                    }
+                }
+            }
+
+            $all_form_data[] = [
+                'form_title'  => sanitize_text_field( $form[ 'title' ] ),
+                'form_id'     => $form_id,
+                'is_active'   => (bool) $form[ 'is_active' ],
+                'folder_path' => $relative_path, // New Data Point
+                'count'       => $stats[ 'count' ],
+                'size_raw'    => $stats[ 'size' ],
+            ];
+
+            $grand_total_size  += $stats[ 'size' ];
+            $grand_total_count += $stats[ 'count' ];
+        }
+
+        usort( $all_form_data, function( $a, $b ) {
+            return $b[ 'size_raw' ] <=> $a[ 'size_raw' ];
+        } );
+
+        $formatted_total_size = $HELPERS->format_precise_size( $grand_total_size );
+        $pdf_schedule = get_option( 'gfat_pdf_schedule', 'none' );
+        ?>
+        <div id="gfat_fillable_pdfs_content">
+            <div class="gfat-header-columns">
+                <div class="gfat-column-summary">
+                    <h3><?php esc_html_e( 'Storage Summary', 'gf-tools' ); ?></h3>
+                    <p>
+                        <strong><?php esc_html_e( 'Total Stored PDFs:', 'gf-tools' ); ?></strong> <?php echo number_format_i18n( $grand_total_count ); ?><br>
+                        <strong><?php esc_html_e( 'Total Storage Used:', 'gf-tools' ); ?></strong> <?php echo esc_html( $formatted_total_size ); ?><br>
+                        <strong><?php esc_html_e( 'Last Cleanup:', 'gf-tools' ); ?></strong> <?php echo esc_html( $last_run_display ); ?><br>
+                        <strong><?php esc_html_e( 'Next Cleanup:', 'gf-tools' ); ?></strong> <?php echo esc_html( $next_run_display ); ?>
+                    </p>
+                </div>
+
+                <div class="gfat-column-tools">
+                    <form id="gfat-pdf-settings-form" method="POST">
+                        <?php wp_nonce_field( 'gfat_pdf_nonce_action', 'gfat_pdf_nonce' ); ?>
+                        <div class="gfat-tool-row">
+                            <div class="gfat-schedule-group">
+                                <label for="gfat_pdf_schedule"><?php esc_html_e( 'Auto-Clear Schedule:', 'gf-tools' ); ?></label>
+                                <select name="gfat_pdf_schedule" id="gfat_pdf_schedule">
+                                    <option value="none" <?php selected( $pdf_schedule, 'none' ); ?>><?php esc_html_e( 'Manual Only', 'gf-tools' ); ?></option>
+                                    <option value="daily" <?php selected( $pdf_schedule, 'daily' ); ?>><?php esc_html_e( 'Daily', 'gf-tools' ); ?></option>
+                                    <option value="weekly" <?php selected( $pdf_schedule, 'weekly' ); ?>><?php esc_html_e( 'Weekly', 'gf-tools' ); ?></option>
+                                </select>
+                            </div>
+                            <button type="submit" name="gfat_save_pdf_settings" class="button gfat-button"><?php esc_html_e( 'Save', 'gf-tools' ); ?></button>
+                            
+                            <button type="button" id="gfat-clear-pdfs-now" class="button button-primary" data-mode="all" data-nonce="<?php echo esc_attr( wp_create_nonce( 'gfat_clear_pdfs' ) ); ?>">
+                                <?php esc_html_e( 'Clear All Connected PDFs Now', 'gf-tools' ); ?>
+                            </button>
+
+                            <button type="button" id="gfat-deep-clean-pdfs" class="button" 
+                                data-mode="deep" 
+                                <?php echo $deep_clean_attr; ?> 
+                                title="<?php echo esc_attr( $deep_clean_title ); ?>"
+                                data-nonce="<?php echo esc_attr( wp_create_nonce( 'gfat_clear_pdfs' ) ); ?>">
+                                <?php esc_html_e( 'Deep Clean All Over 30 Days', 'gf-tools' ); ?>
+                            </button>
+
+                            <?php if ( ! $is_deep_clean_allowed ) : ?>
+                                <p class="description" style="color: #d63638; margin-top: 5px;">
+                                    <span class="dashicons dashicons-lock" style="font-size: 14px; vertical-align: middle;"></span>
+                                    <?php esc_html_e( 'Run a connected clear to unlock Deep Clean.', 'gf-tools' ); ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                        <div id="gfat-ajax-response"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <?php
+
+        $paged        = isset( $_GET[ 'paged' ] ) ? max( 1, intval( $_GET[ 'paged' ] ) ) : 1;
+        $per_page     = get_option( 'gfadvtools_per_page', 25 );
+        $total_forms  = count( $all_form_data );
+        $display_data = array_slice( $all_form_data, ( $paged - 1 ) * $per_page, $per_page );
+
+        foreach ( $display_data as &$row ) {
+            $row[ 'size' ]   = $HELPERS->format_precise_size( $row[ 'size_raw' ] );
+            $row[ 'status' ] = $row[ 'is_active' ] ? '<span style="color:green;">' . __( 'Active', 'gf-tools' ) . '</span>' : '<span style="color:red;">' . __( 'Inactive', 'gf-tools' ) . '</span>';
+        }
+
+        $columns = [
+            'form_title'  => __( 'Form Title', 'gf-tools' ),
+            'form_id'     => __( 'ID', 'gf-tools' ),
+            'status'      => __( 'Status', 'gf-tools' ),
+            'folder_path' => __( 'Storage Path', 'gf-tools' ),
+            'count'       => __( 'PDFs', 'gf-tools' ),
+            'size'        => __( 'Size', 'gf-tools' ),
+        ];
+
+        $this->wp_list_table( $columns, $display_data, $this->get_current_tab(), [], $total_forms );
+    } // End fillable_pdfs()
+
+
+    /**
      * Help page
      *
      * @return void

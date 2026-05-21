@@ -23,6 +23,12 @@ class GF_Advanced_Tools_Import_Export {
 	 */
 	public function __construct() {
 
+        // Combine multiple input columns into one column in entry export files
+        $combine_multiple_input_cols = get_option( 'gfat_export_combine_multiple_input_cols' );
+        if ( $combine_multiple_input_cols ) {
+            add_filter( 'gform_export_fields', [ $this, 'combine_multiple_input_cols' ] );
+        }
+
         // Allows the form export filename to be changed.
         add_filter( 'gform_form_export_filename', [ $this, 'form_filename' ], 10, 2 );
 
@@ -45,6 +51,37 @@ class GF_Advanced_Tools_Import_Export {
         // TODO: Export Spam List in future version
 
 	} // End __construct()
+
+
+    /**
+     * Combine multiple input columns into one column in entry export files
+     *
+     * @param array $form
+     * @return array
+     */
+    public function combine_multiple_input_cols( $form ) {
+        // only modify the form object when the form is loaded for field selection; not when actually exporting
+        if ( rgpost( 'export_lead' ) || rgpost( 'action' ) == 'gf_process_export' ) {
+            return $form;
+        }
+
+        $fields = array();
+
+        foreach ( $form[ 'fields' ] as $field ) {
+            if ( is_a( $field, 'GF_Field' ) && is_array( $field->inputs ) ) {
+                $orig_field    = clone $field;
+                $field->inputs = null;
+                $fields[]      = $field;
+                // $fields[]      = $orig_field;
+            } else {
+                $fields[] = $field;
+            }
+        }
+
+        $form[ 'fields' ] = $fields;
+
+        return $form;
+    } // End combine_multiple_input_cols()
 
 
     /**

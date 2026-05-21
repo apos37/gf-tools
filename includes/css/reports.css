@@ -157,3 +157,140 @@
 .gfat-report-bottom .pagination .gfat-button.current {
     background: #F15A2B;
 }
+
+/* Report Preview */
+
+@media ( max-width: 480px ) {
+    /* Hide all table headers except the first */
+    #gfat-preview-table thead th:not(:first-child),
+    #gfat-preview-table tbody td:not(:first-child) {
+        display: none;
+    }
+
+    #gfat-preview-table thead th:first-child,
+    #gfat-preview-table tbody td:first-child {
+        width: 100%;
+        display: table-cell;
+    }
+    
+    .gfat-report-top {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .gfat-search {
+        width: 100%;
+    }
+
+    .gfat-search form {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    #gfat-search-form input[type="text"],
+    #gfat-search-form input[type="submit"] {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    .gfat-report .gfat-button {
+        margin-left: 0 !important;
+    }
+}
+
+/* Entry Modal on Reports */
+
+#gfat-entry-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Base modal content (desktop/tablet) */
+#gfat-entry-modal .gfat-modal-content {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    min-height: 200px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+
+/* Mobile adjustment */
+@media ( max-width: 480px ) {
+    #gfat-entry-modal .gfat-modal-content {
+        width: calc(100% - 10px);
+        left: 5px;
+        transform: none;
+        top: 5px;
+        bottom: 5px;
+        max-height: none;
+    }
+}
+
+#gfat-entry-modal .gfat-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+#gfat-entry-modal .gfat-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#gfat-entry-modal .gfat-modal-entry-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#gfat-entry-modal .gfat-modal-entry-table th,
+#gfat-entry-modal .gfat-modal-entry-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+/* Centered spinner */
+#gfat-entry-modal .gfat-modal-loader-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: none;
+}
+
+/* Loader spinner */
+#gfat-entry-modal .gfat-modal-loader {
+    width: 50px;
+    height: 50px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #0073aa;
+    border-radius: 50%;
+    animation: gfat-spin 1s linear infinite;
+}
+
+@keyframes gfat-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

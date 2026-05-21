@@ -84,7 +84,8 @@ class GF_Advanced_Tools_Reports {
 
         // Ajax
         add_action( 'wp_ajax_report_get_form_fields', [ $this, 'ajax_report_get_form_fields' ] );
-        add_action( 'wp_ajax_nopriv_report_get_form_fields', [ 'GF_Advanced_Tools_Helpers', 'ajax_must_login' ] );
+        add_action( 'wp_ajax_gfat_get_entry', [ $this, 'ajax_get_entry' ] );
+        add_action( 'wp_ajax_nopriv_gfat_get_entry', [ $this, 'ajax_get_entry' ] );
 
         // JQuery
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
@@ -338,9 +339,7 @@ class GF_Advanced_Tools_Reports {
      */
     public function get_roles( $report_id, $return_array = false ) {
         $value = sanitize_text_field( get_post_meta( $report_id, $this->meta_key_roles, true ) );
-        if ( !$value ) {
-            $value = 'administrator';
-        }
+
         if ( $return_array ) {
             $value = explode( ', ', $value );
             $value = array_map( 'trim', $value );
@@ -348,6 +347,32 @@ class GF_Advanced_Tools_Reports {
         }
         return $value;
     } // End get_selected_roles() 
+
+
+    /**
+     * Check if current user can view the report
+     *
+     * @param int $report_id
+     * @return boolean
+     */
+    public function current_user_can_view_report( $report_id ) {
+        $required_roles = $this->get_roles( $report_id, true );
+        if ( empty( $required_roles ) || ( count( $required_roles ) === 1 && $required_roles[0] === '' ) ) {
+            return true;
+        }
+
+        if ( ! is_user_logged_in() ) {
+            return false;
+        }
+
+        if ( current_user_can( 'manage_options' ) ) {
+            return true;
+        }
+
+        $user = wp_get_current_user();
+        $has_access = array_intersect( $required_roles, (array) $user->roles );
+        return ! empty( $has_access );
+    } // End current_user_can_view_report()
 
 
     /**
@@ -610,7 +635,7 @@ class GF_Advanced_Tools_Reports {
         foreach ( $text_fields as $meta_key => $text_field ) {
             $fx = 'get_'.$meta_key;
             $value = $this->$fx( $post->ID );
-            if ( !$value ) {
+            if ( !$value && $meta_key !== $this->meta_key_roles ) {
                 $value = $text_field[ 'default' ];
             }
 
@@ -1183,6 +1208,105 @@ class GF_Advanced_Tools_Reports {
         wp_send_json( $result );
         die();
     } // End ajax_report_get_form_fields()
+
+
+    /**
+     * AJAX handler to return a Gravity Forms entry for the front-end modal.
+     * Only logged-in users can access.
+     */
+    public function ajax_get_entry() {
+        if ( ! wp_verify_nonce( isset( $_GET[ 'nonce' ] ) ? sanitize_text_field( wp_unslash( $_GET[ 'nonce' ] ) ) : '', 'gfat_shortcode_nonce' ) ) {
+            wp_send_json_error( __( 'Security check failed.', 'gf-tools' ) );
+        }
+
+        $report_id = isset( $_GET[ 'report_id' ] ) ? absint( $_GET[ 'report_id' ] ) : 0;
+
+        if ( ! $this->current_user_can_view_report( $report_id ) ) {
+            wp_send_json_error( __( 'You do not have permission to view this entry.', 'gf-tools' ) );
+        }
+
+        $entry_id = isset( $_GET[ 'entry_id' ] ) ? absint( $_GET[ 'entry_id' ] ) : 0;
+        $form_id  = isset( $_GET[ 'form_id' ] ) ? absint( $_GET[ 'form_id' ] ) : 0;
+
+        if ( ! $entry_id || ! $form_id ) {
+            wp_send_json_error( __( 'Invalid entry or form ID.', 'gf-tools' ) );
+        }
+
+        $entry = GFAPI::get_entry( $entry_id );
+        $form  = GFAPI::get_form( $form_id );
+
+        if ( is_wp_error( $entry ) || ! $form ) {
+            wp_send_json_error( __( 'Entry not found.', 'gf-tools' ) );
+        }
+
+        $output = '<table class="gfat-modal-entry-table" style="width:100%; border-collapse:collapse;">';
+
+        foreach ( $form[ 'fields' ] as $field ) {
+            if ( in_array( $field->type, [ 'html' ], true ) ) {
+                continue;
+            }
+
+            $value = '';
+
+            // Name fields
+            if ( 'name' === $field->type ) {
+                $value = GFCommon::get_lead_field_display( $field, $entry, $entry[ 'id' ] );
+
+            // Consent Fields
+            } elseif ( 'consent' === $field->type ) {
+                $check_input_id = $field->id . '.1';
+                $text_input_id  = $field->id . '.2';
+
+                // Check if the box was actually checked (the .1 index)
+                if ( ! empty( rgar( $entry, $check_input_id ) ) ) {
+                    $consent_text = rgar( $entry, $text_input_id );
+                    
+                    // Fallback to the field's checkboxLabel if the entry text is somehow empty
+                    if ( empty( $consent_text ) ) {
+                        $consent_text = $field->checkboxLabel;
+                    }
+                    
+                    $value = '✓ ' . esc_html( $consent_text );
+                } else {
+                    $value = '✗ ' . esc_html( $consent_text );
+                }
+
+            // Checkboxes
+            } elseif ( 'checkbox' === $field->type && is_array( $field->inputs ) ) {
+
+                $selected = [];
+
+                foreach ( $field->inputs as $input ) {
+                    $input_id = (string) $input[ 'id' ];
+                    if ( isset( $entry[ $input_id ] ) && '' !== $entry[ $input_id ] ) {
+                        $selected[] = '- ' . esc_html( $entry[ $input_id ] );
+                    }
+                }
+
+                $value = implode( '<br>', $selected );
+
+            } else {
+
+                $raw_value = rgar( $entry, (string) $field->id );
+                $value     = GFCommon::get_lead_field_display( $field, $raw_value, $entry[ 'id' ] );
+
+            }
+
+            if ( '' === $value ) {
+                continue;
+            }
+
+            $output .= '<tr>';
+            $output .= '<th style="text-align:left; padding:5px; border-bottom:1px solid #ddd;">' . esc_html( $field->label ) . '</th>';
+            $output .= '<td style="padding:5px; border-bottom:1px solid #ddd;">' . wp_kses_post( $value ) . '</td>';
+            $output .= '</tr>';
+        }
+
+        $output .= '</table>';
+
+        echo $output;
+        wp_die();
+    } // End ajax_get_entry()
 
 
     /**

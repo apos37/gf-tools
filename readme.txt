@@ -1,10 +1,10 @@
 === Advanced Tools for Gravity Forms ===
 Contributors: apos37
 Tags: report, spam, merge tags, search, schedule
-Requires at least: 5.9
+Requires at least: 6.0
 Requires PHP: 7.4
-Tested up to: 6.9
-Stable tag: 1.1.4
+Tested up to: 7.0
+Stable tag: 1.1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -103,6 +103,23 @@ We recommend using our [website support forum](https://pluginrx.com/support/plug
 10. Entry Debugging
 
 == Changelog ==
+= 1.1.6 =
+* Compatibility: Increased minimum required WordPress version to 6.0
+* Compatibility: Tested with WordPress 7.0
+* Tweak: Front-end reports - if an image URL is provided as the value (like an upload field), then a thumbnail will show
+* Fix: Login page redirect causing issues with confirming admin email
+* Fix: Fatal error when classes don't exist yet
+* Update: Added Fillable PDFs integration for clearing pdfs under Forms > Advanced Tools > Fillable PDFs (must have plugin installed)
+* Fix: Attempt to read property "display_name" on false
+
+= 1.1.5 =
+* Fix: Spam filter overriding previous flags (props @emily)
+* Tweak: Front-end reports - search form only finding exact matches, not partial matches
+* Fix: Front-end reports - per page dropdown refreshing to homepage
+* Update: Front-end reports - updated CSS for mobile
+* Update: Front-end reports - changed option for linking to the admin entry on first column to showing a modal with the full entry
+* Update: Added an option in settings to combine multi-input fields into single columns instead of each option as it's own column
+
 = 1.1.4 =
 * Fix: URLs on WP_List_Table Pagination were incorrect, leading to homepage
 * Fix: Custom merge tags with callbacks not being replaced in notifications

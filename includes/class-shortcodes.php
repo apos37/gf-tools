@@ -42,6 +42,9 @@ class GF_Advanced_Tools_Shortcodes {
         // Export Entries on Front-End
         add_shortcode( 'gfat_export_entries', [ $this, 'export_entries' ] );
 
+        // Graph
+        add_shortcode( 'gfat_graph', [ $this, 'graph' ] );
+
         // Export
         if ( isset( $_POST[ 'gfat_entries_export' ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
             $this->export();
@@ -289,12 +292,14 @@ class GF_Advanced_Tools_Shortcodes {
      */
     public function report( $atts ) {
         $atts = shortcode_atts( [
-            'id'      => 0,
-            'param'   => 'report_id',
-            'reports' => false,
+            'id'        => 0,
+            'param'     => 'report_id',
+            'reports'   => false,
+            'unique_id' => ''
         ], $atts );
         $report_id = absint( $atts[ 'id' ] );
         $param = sanitize_key( $atts[ 'param' ] );
+        $unique_id = sanitize_key( $atts[ 'unique_id' ] );
 
         if ( !$report_id && $param != '' ) {
             if ( isset( $_GET[ $param ] ) && absint( $_GET[ $param ] ) > 0 ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -311,6 +316,10 @@ class GF_Advanced_Tools_Shortcodes {
 
                 $GFAT = new GF_Advanced_Tools();
                 $REPORTS = new GF_Advanced_Tools_Reports( null );
+
+                if ( ! $REPORTS->current_user_can_view_report( $report_id ) ) {
+                    return __( 'You do not have permission to view this report.', 'gf-tools' );
+                }
 
                 // Get the form and fields
                 $selected_form_id = absint( $REPORTS->get_selected_form( $report_id ) );
@@ -392,7 +401,8 @@ class GF_Advanced_Tools_Shortcodes {
                 }
                 
                 // Start the container
-                $results = '<div class="gfat-report">';
+                $unique_id_attr = $unique_id ? ' id="' . esc_attr( $unique_id ) . '"' : '';
+                $results = '<div class="gfat-report"' . $unique_id_attr . '>';
                 
                     // Top Section
                     $results .= '<div class="gfat-report-top">';
@@ -440,15 +450,20 @@ class GF_Advanced_Tools_Shortcodes {
                     ];
 
                     if ( $incl_search_bar && $search ) {
-                        $search_criteria[ 'field_filters' ] = [ 
-                            'mode'  => 'any',
-                            [ 'value' => $search ],
+                        $search_criteria[ 'field_filters' ] = [
+                            'mode' => 'any',
+                            [
+                                'key'      => null,          // search all fields
+                                'value'    => $search,
+                                'operator' => 'contains',    // partial match
+                            ],
                         ];
 
                         if ( is_numeric( $search ) && $search > 0 ) {
                             $search_criteria[ 'field_filters' ][] = [
-                                'key'   => 'id',
-                                'value' => $search
+                                'key'      => 'id',
+                                'value'    => $search,
+                                'operator' => '='
                             ];
                         }
                     }
@@ -530,7 +545,7 @@ class GF_Advanced_Tools_Shortcodes {
                         $selected_fields = $REPORTS->get_selected_fields( 'page', $report_id );
                         $link_first_col = $REPORTS->including_link_first_col( $report_id );
 
-                        $results .= '<table id="gfat-preview-table" class="gfat-report-table" data-cols="0">
+                        $results .= '<table id="gfat-preview-table" class="gfat-report-table" data-cols="0" data-report-id="'.$report_id.'">
                             <thead>
                                 <tr>';
                                 
@@ -589,16 +604,15 @@ class GF_Advanced_Tools_Shortcodes {
                                                 // Link the first column
                                                 $col_num++;
                                                 if ( $link_first_col && $col_num === 1 ) {
-                                                    $entry_url = add_query_arg( [
-                                                        'page' => 'gf_entries',
-                                                        'view' => 'entry',
-                                                        'id'   => $selected_form_id,
-                                                        'lid'  => $entry[ 'id' ]
-                                                    ], admin_url( 'admin.php' ) );
-                                                    $value = '<a href="'.$entry_url.'" target="_blank">'.$value.'</a>';
+                                                    $value = '<a href="#" class="gfat-entry-link" data-entry-id="' . $entry[ 'id' ] . '" data-form-id="' . $selected_form_id . '">' . $value . '</a>';
                                                 }
-                                                
-                                                $results .= '<td class="'.esc_attr( $class ).'">'.$value.'</td>';
+
+                                                // If the value is an image url, show a thumbnail with a link to the full image
+                                                if ( filter_var( $value, FILTER_VALIDATE_URL ) && preg_match( '/\.(jpg|jpeg|png|gif)$/i', $value ) ) {
+                                                    $value = '<a href="' . esc_url( $value ) . '" target="_blank"><img src="' . esc_url( $value ) . '" alt="" style="max-width: 70px; max-height: 70px;"></a>';
+                                                }
+
+                                                $results .= '<td class="'.esc_attr( $class ).'">' . $value . '</td>';
                                                 
                                             }
                                         }
@@ -615,15 +629,16 @@ class GF_Advanced_Tools_Shortcodes {
                         $results .= '<div class="gfat-report-bottom">
                             <form id="gfat-per-page-form" method="get">
                                 <label for="gfat-per-page">' . __( 'Entries per page', 'gf-tools' ) . ':</label>
-                                <select id="gfat-per-page" name="per_page" onchange="window.location.href = \'' . esc_url( $current_url_with_dates ) . '&per_page=\' + this.value;">';
+                                <select id="gfat-per-page" name="per_page" onchange="window.location.href = this.value;">';
 
-                                    if ( !in_array( $page_size, $page_size_options ) ) {
+                                    if ( ! in_array( $page_size, $page_size_options ) ) {
                                         $page_size_options[] = $page_size;
                                         sort( $page_size_options );
                                     }
-                                    
+
                                     foreach ( $page_size_options as $option ) {
-                                        $results .= '<option value="'.$option.'"' . ( $page_size == $option ? ' selected' : '' ) . '>'.$option.'</option>';
+                                        $url = add_query_arg( 'per_page', $option, $current_url_with_dates ) . ($unique_id ? '#' . esc_attr($unique_id) : '');
+                                        $results .= '<option value="' . esc_url( $url ) . '"' . ( $page_size == $option ? ' selected' : '' ) . '>' . $option . '</option>';
                                     }
 
                                 $results .= '</select>
@@ -640,36 +655,38 @@ class GF_Advanced_Tools_Shortcodes {
                                 $current_page = max( 1, $page_num );
                                 $results .= '<div class="pagination">';
                                 
+                                // Define the anchor string once
+                                $anchor = $unique_id ? '#' . esc_attr( $unique_id ) : '';
+                                
                                 // Previous page link
                                 if ( $current_page > 1 ) {
                                     $previous_url = add_query_arg( [
                                         'per_page' => $page_size,
                                         'page_num' => $current_page - 1
-                                    ], $current_url_with_dates );
-                                    $results .= '<a href="'.$previous_url.'" class="gfat-button button button-secondary">'.__( 'Previous', 'gf-tools' ).'</a>';
+                                    ], $current_url_with_dates ) . $anchor; // Append anchor here
+                                    
+                                    $results .= '<a href="'.$previous_url.'" class="gfat-button button button-secondary button-previous">'.__( 'Previous', 'gf-tools' ).'</a>';
                                 }
                                 
-                                // Page numbers
+                                // Page numbers calculation
                                 if ( $total_pages <= 5 ) {
-                                    // If there are 5 or fewer pages, show all pages
                                     $start_page = 1;
                                     $end_page = $total_pages;
                                 } elseif ( $current_page > $total_pages - 5 ) {
-                                    // If we're in the last 5 pages, show the last 5 pages
                                     $start_page = max( 1, $total_pages - 4 );
                                     $end_page = $total_pages;
                                 } else {
-                                    // Otherwise, show the next 5 pages
                                     $start_page = $current_page;
-                                    $end_page = min( $start_page + 4, $total_pages );  // Calculate end page, no more than 5 pages ahead
+                                    $end_page = min( $start_page + 4, $total_pages );
                                 }
 
                                 for ( $i = $start_page; $i <= $end_page; $i++ ) {
                                     $page_num_url = add_query_arg( [
                                         'per_page' => $page_size,
                                         'page_num' => $i
-                                    ], $current_url_with_dates );
-                                    $results .= '<a href="'.$page_num_url.'" class="gfat-button button button-secondary'.( $i == $current_page ? ' current' : '' ).'">'.$i.'</a>';
+                                    ], $current_url_with_dates ) . $anchor; // Append anchor here
+                                    
+                                    $results .= '<a href="'.$page_num_url.'" class="gfat-button button button-secondary button-page-num'.( $i == $current_page ? ' current' : '' ).'">'.$i.'</a>';
                                 }
                                 
                                 // Next page link
@@ -677,15 +694,27 @@ class GF_Advanced_Tools_Shortcodes {
                                     $next_url = add_query_arg( [
                                         'per_page' => $page_size,
                                         'page_num' => $current_page + 1
-                                    ], $current_url_with_dates );
-                                    $results .= '<a href="'.$next_url.'" class="gfat-button button button-secondary">'.__( 'Next', 'gf-tools' ).'</a>';
+                                    ], $current_url_with_dates ) . $anchor; // Append anchor here
+                                    
+                                    $results .= '<a href="'.$next_url.'" class="gfat-button button button-secondary button-next">'.__( 'Next', 'gf-tools' ).'</a>';
                                 }
                                 
                                 $results .= '</div>';
                             }
 
                         $results .= '</div>';
-                        
+
+                        if ( $link_first_col ) {
+                            $results .= '<div id="gfat-entry-modal" class="gfat-modal" style="display:none;">
+                                <div class="gfat-modal-content">
+                                    <span class="gfat-modal-close">&times;</span>
+                                    <div class="gfat-modal-loader-container">
+                                        <div class="gfat-modal-loader"></div>
+                                    </div>
+                                    <div class="gfat-modal-body"></div>
+                                </div>
+                            </div>';
+                        }
                     }
 
                 $results .= '</div>';
@@ -1385,6 +1414,128 @@ class GF_Advanced_Tools_Shortcodes {
         // Export it as a csv
         $HELPERS->export_csv( $filename, $header_row, $data_rows );
     } // End export()
+    
+
+    /**
+     * Display a graph for Any Form
+     * USAGE: [gfat_graph form_id="#" field_id="#" type="bar|pie|line|spline"]
+     *
+     * @param array $atts
+     * @return string
+     */
+    public function graph( $atts ) {
+        $atts = shortcode_atts( [
+            'form_id'   => 0,
+            'field_id'  => 0,
+            'type'      => 'bar',
+            'page_size' => 500,
+            'sort'      => false,
+            'title'     => '',
+        ], $atts );
+
+        $form_id   = absint( $atts[ 'form_id' ] );
+        $field_id  = sanitize_text_field( $atts[ 'field_id' ] );
+        $type      = sanitize_key( $atts[ 'type' ] );
+        $page_size = absint( $atts[ 'page_size' ] );
+        $sort      = strtoupper( sanitize_text_field( $atts[ 'sort' ] ) );
+        $title     = sanitize_text_field( $atts[ 'title' ] );
+
+        if ( ! $form_id || ! $field_id ) return __( 'Invalid Form or Field ID.', 'gf-tools' );
+
+        // 1. Define a unique cache key for this specific data set
+        // We include field_id and sort because they change the final $data array.
+        $cache_key = "gfat_data_{$form_id}_{$field_id}_{$page_size}_{$sort}";
+        $data = get_transient( $cache_key );
+
+        // 2. If cache is empty, run the processing logic
+        if ( false === $data ) {
+            
+            static $form_cache    = [];
+            static $entries_cache = [];
+
+            if ( ! isset( $form_cache[ $form_id ] ) ) {
+                $form_cache[ $form_id ] = GFAPI::get_form( $form_id );
+            }
+            $form = $form_cache[ $form_id ];
+            if ( ! $form ) return __( 'Form not found.', 'gf-tools' );
+
+            $entry_key = "{$form_id}_{$page_size}";
+            if ( ! isset( $entries_cache[ $entry_key ] ) ) {
+                $entries_cache[ $entry_key ] = GFAPI::get_entries( $form_id, [ 'status' => 'active' ], null, [ 'offset' => 0, 'page_size' => $page_size ] );
+            }
+            $entries = $entries_cache[ $entry_key ];
+            if ( empty( $entries ) ) return __( 'No entries found.', 'gf-tools' );
+
+            $counts = [];
+            $field  = RGFormsModel::get_field( $form, $field_id );
+            $ignore_labels = [ '-- select one --', 'select one', '-- select --', 'please select' ];
+            $is_checkbox = ( $field && $field->get_input_type() === 'checkbox' );
+
+            if ( $field && ! empty( $field->choices ) ) {
+                foreach ( $field->choices as $choice ) {
+                    $text = trim( $choice[ 'text' ] );
+                    if ( in_array( strtolower( $text ), $ignore_labels ) ) continue;
+                    $counts[ $text ] = 0;
+                }
+            }
+
+            foreach ( $entries as $entry ) {
+                if ( $is_checkbox ) {
+                    foreach ( $field->inputs as $input ) {
+                        $val = isset( $entry[ (string) $input[ 'id' ] ] ) ? trim( $entry[ (string) $input[ 'id' ] ] ) : '';
+                        if ( $val !== '' && isset( $counts[ $val ] ) ) {
+                            $counts[ $val ]++;
+                        }
+                    }
+                } else {
+                    $val = isset( $entry[ $field_id ] ) ? trim( $entry[ $field_id ] ) : '';
+                    if ( $val === '' ) continue;
+                    $label = $field ? $field->get_value_export( $entry, $field_id ) : $val;
+                    if ( in_array( strtolower( $label ), $ignore_labels ) ) continue;
+                    if ( isset( $counts[ $label ] ) ) $counts[ $label ]++;
+                }
+            }
+
+            $denominator = $is_checkbox ? count( $entries ) : array_sum( $counts );
+            if ( $denominator <= 0 ) return __( 'No valid data available.', 'gf-tools' );
+
+            $data = [];
+            foreach ( $counts as $label => $count ) {
+                $data[] = [
+                    'label' => $label,
+                    'count' => $count,
+                    'perc'  => ( $count / $denominator ) * 100,
+                ];
+            }
+
+            if ( $sort === 'ASC' ) {
+                usort( $data, function ( $a, $b ) { return $a[ 'perc' ] <=> $b[ 'perc' ]; } );
+            } elseif ( $sort === 'DESC' ) {
+                usort( $data, function ( $a, $b ) { return $b[ 'perc' ] <=> $a[ 'perc' ]; } );
+            }
+
+            $data = array_values( $data );
+
+            // Store the results for 15 minutes (900 seconds)
+            set_transient( $cache_key, $data, 15 * MINUTE_IN_SECONDS );
+        }
+
+        // 3. Assign Colors (Always done outside cache to ensure freshness/consistency)
+        $GRAPHS = new GF_Advanced_Tools_Graphs();
+        $colors = $GRAPHS->get_colors();
+        foreach ( $data as $key => $row ) {
+            $data[ $key ][ 'color' ] = $colors[ $key % count( $colors ) ];
+        }
+
+        // Checkbox Pie Safety
+        $is_checkbox = ( RGFormsModel::get_field( GFAPI::get_form( $form_id ), $field_id )->get_input_type() === 'checkbox' );
+        if ( $is_checkbox && $type === 'pie' ) {
+            $type = 'bar';
+        }
+
+        $method = "render_{$type}";
+        return method_exists( $GRAPHS, $method ) ? $GRAPHS->$method( $data, $title ) : $GRAPHS->render_bar( $data, $title );
+    } // End graph()
 
 
     /**
@@ -1400,8 +1551,9 @@ class GF_Advanced_Tools_Shortcodes {
         $handle = 'gfadvtools_shortcodes';
         wp_register_script( $handle.'_script', GFADVTOOLS_PLUGIN_DIR.'includes/js/shortcodes.js', [ 'jquery' ], time(), true );
         wp_localize_script( $handle.'_script', $handle, [ 
-            'check_a_box' => __( 'Please check at least one checkbox before submitting.', 'gf-tools' )
-            // 'ajaxurl' => admin_url( 'admin-ajax.php' ) 
+            'check_a_box' => __( 'Please check at least one checkbox before submitting.', 'gf-tools' ),
+            'nonce' => wp_create_nonce( $this->nonce ),
+            'ajaxurl' => admin_url( 'admin-ajax.php' ) 
         ] );
         wp_enqueue_script( 'jquery' );
         wp_enqueue_script( $handle.'_script' );

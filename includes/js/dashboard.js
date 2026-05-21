@@ -316,5 +316,63 @@ jQuery( $ => {
             e.preventDefault();
         }
     } );
+
+
+    /**
+     * DELETE ALL FILLABLE PDFS
+     */
+    $( '#gfat-clear-pdfs-now, #gfat-deep-clean-pdfs' ).on( 'click', function( e ) {
+        e.preventDefault();
+
+        var $button      = $( this );
+        var $response    = $( '#gfat-ajax-response' );
+        var nonce        = $button.data( 'nonce' );
+        var mode         = $button.data( 'mode' );
+        var runningTotal = 0;
+
+        var confirmMsg = ( mode === 'deep' ) 
+            ? 'DEEP CLEAN: This forcefully wipes the disk of files over 30 days old. You should only do this if you have already cleared all connected PDFs so that it will only clean disconnected files and empty folders. Proceed?' 
+            : 'Clear all PDFs connected to active entries?';
+
+        if ( ! confirm( confirmMsg ) ) return;
+
+        $button.prop( 'disabled', true ).text( 'Processing...' );
+        
+        function processBatch( currentOffset, totalCount ) {
+            $.post( ajaxurl, {
+                action: 'gfat_clear_fillable_pdfs',
+                _ajax_nonce: nonce,
+                offset: currentOffset,
+                total: totalCount,
+                mode: mode
+            }, function( response ) {
+                if ( response.success ) {
+                    // Always increment total first
+                    runningTotal += parseInt( response.data.processed_in_batch );
+
+                    if ( response.data.done ) {
+                        var finalMsg = response.data.message + ' (' + runningTotal + ' items processed)';
+                        $response.text( finalMsg ).css( 'color', 'green' );
+                        setTimeout( function() { location.reload(); }, 3000 );
+                    } else {
+                        var total   = parseInt( response.data.total );
+                        var offset  = parseInt( response.data.offset );
+                        var percent = ( total > 0 ) ? Math.min( Math.round( ( offset / total ) * 100 ), 100 ) : 0;
+
+                        $response.html( '<span class="spinner is-active" style="float:none; margin:0 10px 0 0;"></span> ' + 
+                            'Cleaning disk... <strong>(' + percent + '%)</strong>' );
+                        
+                        processBatch( offset, total );
+                    }
+                } else {
+                    // This will catch the 24-hour lock error
+                    $response.text( response.data ).css( 'color', 'red' );
+                    $button.prop( 'disabled', false ).text( 'Retry' );
+                }
+            });
+        }
+
+        processBatch( 0, 0 );
+    });
     
 } )
