@@ -651,3 +651,84 @@ form#gfat-merge_tags-form .search-field:not(:last-of-type) {
     padding: 0 !important;
     line-height: 1 !important;
 }
+
+.gfat-log-group {
+	border: 1px solid #ccd0d4;
+	margin-bottom: 6px;
+	padding: 6px 10px;
+}
+
+.gfat-log-group summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.gfat-log-group-body {
+	margin-top: 8px;
+}
+
+.gfat-log-line {
+	font-family: Consolas, monospace;
+	font-size: 12px;
+	padding: 2px 0;
+}
+
+.gfat-log-time {
+	opacity: 0.6;
+	margin-right: 6px;
+}
+
+.gfat-log-label {
+	opacity: 0.7;
+	margin-right: 6px;
+}
+
+.gfat-level-error,
+.gfat-level-fatal {
+	color: #d63638;
+}
+
+.gfat-level-warn {
+	color: #b45f06;
+}
+
+.gfat-level-validation {
+	color: #8a2be2;
+}
+
+#gfat-log-raw pre {
+	background: #f6f7f7;
+	padding: 10px;
+	overflow-x: auto;
+}
+
+.gfat-caution {
+	color: #d63638;
+	border-color: #d63638 !important;
+}
+
+#gfat-log-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 30px;
+}
+
+#gfat-log-filters {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+#gfat-log-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.gfat-highlight-search {
+	background: #fff2a8;
+	font-style: normal;
+	padding: 0 1px;
+}

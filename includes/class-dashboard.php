@@ -2816,6 +2816,22 @@ class GF_Advanced_Tools_Dashboard {
 
 
     /**
+     * Logs — View the Gravity Forms Error Log
+     *
+     * @return void
+     */
+    public function logs() {
+		if ( empty( $this->plugin_settings[ 'logs_enabled' ] ) ) {
+			echo '<p>'.esc_html__( 'The error log is currently disabled.', 'gf-tools' ).' <a href="'.esc_url( GFADVTOOLS_SETTINGS_URL ).'#developers">'.esc_html__( 'Enable it in Settings.', 'gf-tools' ).'</a></p>';
+			return;
+		}
+
+		echo '<h2>'.esc_html__( 'Gravity Forms Error Log', 'gf-tools' ).'</h2>';
+		GF_Advanced_Tools_Logs::render_tab();
+	} // End logs()
+
+
+    /**
      * Help page
      *
      * @return void

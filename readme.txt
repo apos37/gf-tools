@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 6.0
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 1.1.7
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -48,7 +48,8 @@ Unlock advanced tools and customizations to supercharge your Gravity Forms exper
 
 === For Developers ===
 - **Debug Tools:** Access quick debug views of form and entry objects directly from the toolbar.
-- **Log Messages:** Record Gravity Forms messages to the debug log for troubleshooting.
+- **Error Log Viewer:** Capture and browse core and add-on log messages in a dedicated in-dashboard viewer, independent of Gravity Forms' own logging settings.
+- **Log Messages to Debug Log:** Alternatively, record Gravity Forms log messages directly to your site's debug.log file for troubleshooting.
 - **Custom Fields:** Add custom fields to form settings for extended functionality.
 
 === And Many More... ===
@@ -103,6 +104,10 @@ We recommend using our [website support forum](https://pluginrx.com/support/plug
 10. Entry Debugging
 
 == Changelog ==
+= 1.2.0 =
+* Update: Added our own Gravity Forms Error Log viewer under Forms > Advanced Tools > Logs. Captures core and add-on log messages independent of Gravity Forms' own logging settings, with search, filtering by source and form, keyword exclusion (both at capture time and in the log view), and automatic cleanup after a configurable number of days.
+* Update: Added an optional setting to log validation failures for troubleshooting silent submission failures (e.g. reCAPTCHA or custom validation hooks that don't return a message).
+
 = 1.1.7 =
 * Fix: Consent field cross-contamination in entry modal where unchecked fields displayed text from a previously iterated consent field
 * Fix: Deprecated GFCommon::get_lead_field_display() calls passing entry ID instead of entry array as third parameter, resolving warnings introduced in GF 2.9.29

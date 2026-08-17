@@ -75,6 +75,7 @@ class GF_Advanced_Tools extends GFAddOn {
             'shortcodes'      => 'Shortcodes',
             'form-display'    => 'Form_Display',
             'fillable-pdfs'   => 'Fillable_PDFs',
+            'logs'            => 'Logs',
             'dashboard'       => 'Dashboard',
             'login'           => 'Login',
             'registration'    => 'Registration',
@@ -248,6 +249,7 @@ class GF_Advanced_Tools extends GFAddOn {
             $tabs[ 'fillable_pdfs' ] = [ 'label' => 'Fillable PDFs' ];
         }
 
+        $tabs[ 'logs' ]     = [ 'label' => 'Logs' ];
         $tabs[ 'settings' ] = [ 'label' => 'Settings' ];
         $tabs[ 'help' ]     = [ 'label' => 'Help' ];
 
@@ -1101,6 +1103,48 @@ class GF_Advanced_Tools extends GFAddOn {
                                 'name'  => 'use_debug_log',
                             ],
                         ],
+                    ],
+                    [
+                        'type'    => 'checkbox',
+                        'name'    => 'logs_enabled_group',
+                        'label'   => esc_html__( 'Enable Our Own Gravity Forms Logging', 'gf-tools' ).' - <a href="'.gfadvtools_get_plugin_page_tab( 'logs' ).'">'.esc_html__( 'View Logs', 'gf-tools' ).'</a>',
+                        'tooltip' => esc_html__( 'Captures GF core and add-on log messages to a private database table, independent of GF\'s own logging settings.', 'gf-tools' ),
+                        'choices' => [
+                            [ 'label' => esc_html__( 'Yes', 'gf-tools' ), 'name' => 'logs_enabled' ],
+                        ],
+                    ],
+                    [
+                        'type'  => 'checkbox',
+                        'name'  => 'logs_errors_only_group',
+                        'label' => esc_html__( 'Only Log Errors', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'Leave off to capture all levels; on to capture Error and Fatal only.', 'gf-tools' ),
+                        'choices' => [
+                            [ 'label' => esc_html__( 'Yes', 'gf-tools' ), 'name' => 'logs_errors_only' ],
+                        ],
+                    ],
+                    [
+                        'type'  => 'checkbox',
+                        'name'  => 'logs_validation_enabled_group',
+                        'label' => esc_html__( 'Log Validation Failures', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'Diagnostic only, for tracking down silent validation failures (reCAPTCHA, custom hooks). Leave off outside active testing.', 'gf-tools' ),
+                        'choices' => [
+                            [ 'label' => esc_html__( 'Yes', 'gf-tools' ), 'name' => 'logs_validation_enabled' ],
+                        ],
+                    ],
+                    [
+                        'type'          => 'text',
+                        'input_type'    => 'number',
+                        'name'          => 'logs_auto_delete_days',
+                        'label'         => esc_html__( 'Auto-Delete Log Entries After (Days)', 'gf-tools' ),
+                        'class'         => 'small',
+                        'default_value' => '30',
+                    ],
+                    [
+                        'type'    => 'textarea',
+                        'name'    => 'logs_excluded_keywords',
+                        'label'   => esc_html__( 'Exclude Keywords from Error Log', 'gf-tools' ),
+                        'tooltip' => esc_html__( 'Messages containing any of these keywords will never be captured. Separate multiple keywords with commas.', 'gf-tools' ),
+                        'class'   => 'large',
                     ],
                     [
                         'type' => 'html',

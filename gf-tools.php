@@ -3,7 +3,7 @@
  * Plugin Name:         Advanced Tools for Gravity Forms
  * Plugin URI:          https://pluginrx.com/plugin/gf-tools/
  * Description:         Unlock advanced tools to supercharge your Gravity Forms experience with enhanced features and streamlined management.
- * Version:             1.1.7
+ * Version:             1.2.0
  * Requires at least:   6.0
  * Tested up to:        7.1
  * Requires PHP:        7.4
@@ -90,6 +90,22 @@ require_once GFADVTOOLS_PLUGIN_ROOT.'includes/class-helpers.php';
 // Import/Export
 require_once GFADVTOOLS_PLUGIN_ROOT.'includes/class-import-export.php';
 new GF_Advanced_Tools_Import_Export();
+
+// Logs
+require_once GFADVTOOLS_PLUGIN_ROOT.'includes/class-logs.php';
+
+
+/**
+ * Create the log table and schedule cleanup if not already done for this version
+ */
+add_action( 'admin_init', 'gfadvtools_maybe_create_logs_table' );
+
+function gfadvtools_maybe_create_logs_table() {
+    if ( get_option( 'gfat_logs_table_version' ) !== GFADVTOOLS_VERSION ) {
+        GF_Advanced_Tools_Logs::create_table();
+        update_option( 'gfat_logs_table_version', GFADVTOOLS_VERSION );
+    }
+} // End gfadvtools_maybe_create_logs_table()
 
 
 /**
@@ -190,6 +206,11 @@ function gfadvtools_plugin_row_meta( $links, $file ) {
  */
 add_action( 'gform_uninstalling', 'gfadvtools_cleanup' );
 register_uninstall_hook( __FILE__, 'gfadvtools_cleanup' );
+register_deactivation_hook( __FILE__, 'gfadvtools_deactivate' );
+
+function gfadvtools_deactivate() {
+    GF_Advanced_Tools_Logs::unschedule_cleanup();
+} // End gfadvtools_deactivate()
 
 
 /**
@@ -204,4 +225,7 @@ function gfadvtools_cleanup() {
     delete_option( 'gfat_last_entry_id' );
     delete_option( 'gfat_recent_entry_count' );
     delete_option( 'gfadvtools_per_page' );
+    delete_option( 'gfat_logs_table_version' );
+    GF_Advanced_Tools_Logs::drop_table();
+    GF_Advanced_Tools_Logs::unschedule_cleanup();
 } // End gfadvtools_cleanup()
