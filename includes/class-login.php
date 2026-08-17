@@ -59,6 +59,14 @@ class GF_Advanced_Tools_Login {
 
 
     /**
+     * Store the ID of the register page.
+     *
+     * @var int
+     */
+    public $register_page_id;
+
+
+    /**
      * Store the ID of the contact page.
      *
      * @var int
@@ -68,6 +76,8 @@ class GF_Advanced_Tools_Login {
 
     /**
 	 * Constructor
+     * 
+     * @param array $plugin_settings The plugin settings.
 	 */
 	public function __construct( $plugin_settings ) {
 
@@ -88,12 +98,13 @@ class GF_Advanced_Tools_Login {
 
         // Let's add links below the submit button
         $this->contact_page_id = isset( $plugin_settings[ 'contact_page' ] ) ? absint( $plugin_settings[ 'contact_page' ] ) : 0;
+        $this->register_page_id = isset( $plugin_settings[ 'register_page' ] ) ? absint( $plugin_settings[ 'register_page' ] ) : 0;
         add_filter( 'gform_submit_button_' . $this->form_id, [ $this, 'add_links_below_button' ], 10, 2 );
 
         // Run the hooks
         add_filter( 'gform_validation_' . $this->form_id, [ $this, 'validate_login_fields' ] );
         add_action( 'gform_pre_submission_' . $this->form_id, [ $this, 'remove_trailing_spaces' ] );
-        add_action( 'gform_after_submission_' . $this->form_id, [ $this, 'sign_the_user_in' ], 10, 2 );
+        add_action( 'gform_pre_submission_' . $this->form_id, [ $this, 'pre_submission_login' ] );
         add_filter( 'gform_confirmation_' . $this->form_id, [ $this, 'confirmation' ], 10, 4 );
 
 	} // End __construct()
@@ -136,10 +147,30 @@ class GF_Advanced_Tools_Login {
             return $button;
         }
 
+        $links = '<div class="gfadvtools-login-help-links">';
+
+        if ( get_option( 'users_can_register' ) ) {
+            $register_url = ! empty( $this->register_page_id ) ? get_permalink( $this->register_page_id ) : wp_registration_url();
+
+            if ( isset( $_GET[ 'redirect_to' ] ) ) {
+                $register_url = add_query_arg(
+                    [
+                        'redirect_to' => rawurlencode( esc_url_raw( wp_unslash( $_GET[ 'redirect_to' ] ) ) ),
+                    ],
+                    $register_url
+                );
+            }
+
+            $links .= sprintf(
+                '<a href="%s">%s</a> | ',
+                esc_url( $register_url ),
+                esc_html__( 'Create an Account', 'gf-tools' )
+            );
+        }
+
         $reset_url = wp_lostpassword_url();
-        $links     = sprintf(
-            '<div class="gfadvtools-login-help-links">
-                <a href="%s">%s</a>',
+        $links    .= sprintf(
+            '<a href="%s">%s</a>',
             esc_url( $reset_url ),
             esc_html__( 'Lost your password?', 'gf-tools' )
         );
@@ -242,43 +273,32 @@ class GF_Advanced_Tools_Login {
 
 
     /**
-     * Sign the user in
+     * Handle the login process before form submission.
      *
-     * @param array $entry
      * @param array $form
-     * @return void
      */
-    public function sign_the_user_in( $entry, $form ) {
-        // Sanitize inputs
-        $email = sanitize_email( rgar( $entry, $this->email_field_id ) );
-        $pass  = rgar( $entry, $this->password_field_id ); // password raw
+    public function pre_submission_login( $form ) {
+        $email_field_id    = $this->email_field_id;
+        $password_field_id = $this->password_field_id;
 
-        if ( empty( $email ) || empty( $pass ) ) {
-            return; // or handle error
-        }
+        $email = sanitize_email( rgpost( 'input_' . $email_field_id ) );
+        $pass  = wp_unslash( $_POST[ 'input_' . $password_field_id ] ?? '' );
 
-        // Get username by email or fallback to email as username
+        if ( empty( $email ) || empty( $pass ) ) return;
+
         $user = get_user_by( 'email', $email );
-        $username = $user ? $user->user_login : $email;
+        if ( ! $user ) return;
 
-        // Get remember me value from the entry, cast to boolean
-        $remember = !empty( rgar( $entry, $this->remember_me_field_id ) );
-
-        $creds = [
-            'user_login'    => $username,
-            'user_password' => $pass,
-            'remember'      => $remember,
-        ];
-
-        $signon = wp_signon( $creds, is_ssl() );
-        if ( is_wp_error( $signon ) ) {
+        if ( ! wp_check_password( $pass, $user->user_pass, $user->ID ) ) {
             return;
         }
 
-        // Successful login: set current user and auth cookie
-        wp_set_current_user( $signon->ID );
-        wp_set_auth_cookie( $signon->ID );
-    } // End sign_the_user_in()
+        $remember = ! empty( rgpost( 'input_' . $this->remember_me_field_id ) );
+
+        wp_set_current_user( $user->ID );
+        wp_set_auth_cookie( $user->ID, $remember );
+        do_action( 'wp_login', $user->user_login, $user );
+    } // End pre_submission_login()
 
     
     /**
@@ -292,9 +312,9 @@ class GF_Advanced_Tools_Login {
      */
     public function confirmation( $confirmation, $form, $entry, $ajax ) {
         $redirect_to = null;
-        $access_admin = false;
 
-        // Priority 1: Get raw URL from query or entry
+        $user = is_user_logged_in() ? wp_get_current_user() : false;
+
         $raw_url = '';
         if ( isset( $_GET[ 'redirect_to' ] ) ) {
             $raw_url = sanitize_url( wp_unslash( $_GET[ 'redirect_to' ] ) );
@@ -302,27 +322,15 @@ class GF_Advanced_Tools_Login {
             $raw_url = sanitize_url( rgar( $entry, $this->redirect_to_field_id ) );
         }
 
-        if ( !empty( $raw_url ) ) {
+        if ( ! empty( $raw_url ) ) {
             $redirect_to = urldecode( $raw_url );
+        } elseif ( $user ) {
+            $access_admin = user_can( $user, 'manage_options' );
+            $redirect_to  = $access_admin ? admin_url() : home_url();
+            $redirect_to  = apply_filters( 'gfat_user_landing_page', $redirect_to, $user, $access_admin );
+        }
 
-        } else {
-            // Get user for potential fallback and filtering
-            $user_email = sanitize_email( rgar( $entry, $this->email_field_id ) );
-            $user = $user_email ? get_user_by( 'email', $user_email ) : null;
-
-            if ( $user ) {
-                $access_admin = user_can( $user, 'manage_options' );
-
-                // Fallback
-                $redirect_to = $access_admin ? admin_url() : home_url();
-
-                // Apply final filter
-                $redirect_to = apply_filters( 'gfat_user_landing_page', $redirect_to, $user, $access_admin );
-            }
-        }        
-
-        // If still no redirect, fallback to login page
-        if ( !$redirect_to && $this->page_id ) {
+        if ( ! $redirect_to && $this->page_id ) {
             $redirect_to = get_permalink( $this->page_id );
         }
 

@@ -618,9 +618,11 @@ class GF_Advanced_Tools_Helpers {
      *
      * @param string $value
      * @param int $field_id
-     * @param int $entry_id
-     * @param int $form_id
+     * @param array $entry
+     * @param array $form
      * @param string $date_format
+     * @param object|null $HELPERS
+     * @param boolean $export
      * @return string
      */
     public function filter_entry_value( $value, $field_id, $entry, $form, $date_format = 'n/j/Y', $HELPERS = null, $export = true ) {
@@ -649,6 +651,47 @@ class GF_Advanced_Tools_Helpers {
                 if ( isset( $value ) && $value == 1 || ( isset( $entry[ $field_id.'.1' ] ) && $entry[ $field_id.'.1' ] == 1 ) ) {
                     $value = 'True';
                 }
+
+            // Likert fields
+            } elseif ( 'survey' === $field->type && 'likert' === $field->inputType ) {
+                $form_id = $form[ 'id' ];
+                $gf_field = GFAPI::get_field( $form_id, $field->id );
+                $text = $gf_field->get_value_export( $entry, $field->id, true );
+                $is_multi = $field->gsurveyLikertEnableMultipleRows;
+                $rows = $is_multi ? $field->inputs : [ [ 'label' => $field->label, 'id' => $field->id ] ];
+                $col_labels = array_map( function( $c ) { return $c[ 'text' ]; }, $field->choices );
+
+                $row_values = [];
+                if ( $text ) {
+                    if ( $is_multi ) {
+                        preg_match_all( '/\d+\.\s*(.*?)\s*:\s*(.*?)(?=,\s*\d+\.|$)/s', $text, $matches, PREG_SET_ORDER );
+                        foreach ( $matches as $match ) {
+                            $row_label = preg_replace( '/^\d+\.\s*/', '', trim( $match[1] ) );
+                            $row_values[ $row_label ] = trim( $match[2] );
+                        }
+                    } else {
+                        $row_values[ $field->label ] = trim( $text );
+                    }
+                }
+
+                $value = '<table class="gfat-likert-table" style="width:100%; border-collapse:collapse;"><thead><tr><th></th>';
+                foreach ( $col_labels as $col_label ) {
+                    $value .= '<th style="text-align:center; padding:4px;">' . esc_html( $col_label ) . '</th>';
+                }
+                $value .= '</tr></thead><tbody>';
+
+                foreach ( $rows as $row ) {
+                    $row_label = $is_multi ? preg_replace( '/^\d+\.\s*/', '', $row[ 'label' ] ) : $field->label;
+                    $selected = isset( $row_values[ $row_label ] ) ? $row_values[ $row_label ] : '';
+                    $value .= '<tr><td style="padding:4px;">' . esc_html( $row[ 'label' ] ) . '</td>';
+                    foreach ( $col_labels as $col_label ) {
+                        $is_selected = $selected !== '' && $selected === $col_label;
+                        $value .= '<td style="text-align:center; padding:4px;">' . ( $is_selected ? '✓' : '' ) . '</td>';
+                    }
+                    $value .= '</tr>';
+                }
+
+                $value .= '</tbody></table>';
 
             // List field
             } elseif ( $field->type == 'list' || ( $field->type == 'post_custom_field' && $field->inputType == 'list' ) ) {
@@ -719,7 +762,7 @@ class GF_Advanced_Tools_Helpers {
             'resolved_date'
         ];
         if ( $value && ( in_array( $field_id, $date_fields ) || $is_date ) ) {
-            $value = gmdate( $date_format, strtotime( $value ) );
+            $value = wp_date( $date_format, strtotime( $value ) );
         }
 
         // Allow others

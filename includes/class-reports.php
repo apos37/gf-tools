@@ -1250,22 +1250,20 @@ class GF_Advanced_Tools_Reports {
 
             // Name fields
             if ( 'name' === $field->type ) {
-                $value = GFCommon::get_lead_field_display( $field, $entry, $entry[ 'id' ] );
+                $value = GFCommon::get_lead_field_display( $field, $entry, $entry );
 
             // Consent Fields
             } elseif ( 'consent' === $field->type ) {
                 $check_input_id = $field->id . '.1';
                 $text_input_id  = $field->id . '.2';
 
-                // Check if the box was actually checked (the .1 index)
+                $consent_text = rgar( $entry, $text_input_id );
+
+                if ( empty( $consent_text ) ) {
+                    $consent_text = $field->checkboxLabel;
+                }
+
                 if ( ! empty( rgar( $entry, $check_input_id ) ) ) {
-                    $consent_text = rgar( $entry, $text_input_id );
-                    
-                    // Fallback to the field's checkboxLabel if the entry text is somehow empty
-                    if ( empty( $consent_text ) ) {
-                        $consent_text = $field->checkboxLabel;
-                    }
-                    
                     $value = '✓ ' . esc_html( $consent_text );
                 } else {
                     $value = '✗ ' . esc_html( $consent_text );
@@ -1285,10 +1283,52 @@ class GF_Advanced_Tools_Reports {
 
                 $value = implode( '<br>', $selected );
 
+            // Likert fields
+            } elseif ( 'survey' === $field->type && 'likert' === $field->inputType ) {
+                $gf_field = GFAPI::get_field( $form_id, $field->id );
+                $text = $gf_field->get_value_export( $entry, $field->id, true );
+                $is_multi = $field->gsurveyLikertEnableMultipleRows;
+                $rows = $is_multi ? $field->inputs : [ [ 'label' => $field->label, 'id' => $field->id ] ];
+                $col_labels = array_map( function( $c ) { return $c[ 'text' ]; }, $field->choices );
+
+                $row_values = [];
+                if ( $text ) {
+                    if ( $is_multi ) {
+                        $pairs = explode( ', ', $text );
+                        foreach ( $pairs as $pair ) {
+                            $parts = explode( ': ', $pair, 2 );
+                            if ( count( $parts ) === 2 ) {
+                                $row_values[ trim( $parts[0] ) ] = trim( $parts[1] );
+                            }
+                        }
+                    } else {
+                        $row_values[ $field->label ] = trim( $text );
+                    }
+                }
+
+                $value = '<table class="gfat-likert-table test-2" style="width:100%; border-collapse:collapse;"><thead><tr><th></th>';
+                foreach ( $col_labels as $col_label ) {
+                    $value .= '<th style="text-align:center; padding:4px;">' . esc_html( $col_label ) . '</th>';
+                }
+                $value .= '</tr></thead><tbody>';
+
+                foreach ( $rows as $row ) {
+                    $row_label = $is_multi ? preg_replace( '/^\d+\.\s*/', '', $row[ 'label' ] ) : $field->label;
+                    $selected = isset( $row_values[ $row_label ] ) ? $row_values[ $row_label ] : '';
+                    $value .= '<tr><td style="padding:4px;">' . esc_html( $row[ 'label' ] ) . '</td>';
+                    foreach ( $col_labels as $col_label ) {
+                        $is_selected = $selected !== '' && $selected === $col_label;
+                        $value .= '<td style="text-align:center; padding:4px;">' . ( $is_selected ? '✓' : '' ) . '</td>';
+                    }
+                    $value .= '</tr>';
+                }
+
+                $value .= '</tbody></table>';
+
             } else {
 
                 $raw_value = rgar( $entry, (string) $field->id );
-                $value     = GFCommon::get_lead_field_display( $field, $raw_value, $entry[ 'id' ] );
+                $value     = GFCommon::get_lead_field_display( $field, $raw_value, $entry );
 
             }
 
@@ -1474,7 +1514,7 @@ class GF_Advanced_Tools_Reports {
                 if ( $field_data[ 'is_form_meta' ] ) {
                     $value = sanitize_text_field( $selected_form[ $field_id ] );
                     if ( $field_id == 'date_created' ) {
-                        $value = gmdate( $date_format, strtotime( $value ) );
+                        $value = wp_date( $date_format, strtotime( $value ) );
                     }
 
                 // User meta

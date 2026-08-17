@@ -335,6 +335,7 @@ class GF_Advanced_Tools_Shortcodes {
                 }
 
                 // Search
+                $search = '';
                 $searching = '';
                 $incl_search_bar = false;
                 if ( $incl_search_bar = $REPORTS->including_search_bar( $report_id ) ) {
@@ -342,8 +343,6 @@ class GF_Advanced_Tools_Shortcodes {
                         $search = sanitize_text_field( wp_unslash( $_GET[ 'search' ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         /* translators: %s is the search term. */
                         $searching = sprintf( __( 'Searching for "%s"', 'gf-tools' ), $search ).' ';
-                    } else {
-                        $search = '';
                     }
                 }
 
@@ -353,34 +352,35 @@ class GF_Advanced_Tools_Shortcodes {
                 $incl_quarter_links = false;
                 $date_format = sanitize_text_field( $REPORTS->get_selected_date_format( $report_id ) );
 
+                $start = wp_date( 'Y-m-d', strtotime( get_user_option( 'user_registered', 1 ) ) );
+                $end = wp_date( 'Y-m-d' );
+
+                $ff = false;
+
                 if ( $incl_date_filter = $REPORTS->including_date_filter( $report_id ) ) {
 
                     if ( isset( $_GET[ 'start_date' ] ) && sanitize_text_field( wp_unslash( $_GET[ 'start_date' ] ) ) != '' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         $start = sanitize_text_field( wp_unslash( $_GET[ 'start_date' ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         $date_filter = true;
-                    } else {
-                        $start = gmdate( 'Y-m-d', strtotime( get_user_option( 'user_registered', 1 ) ) );
                     }
 
                     if ( isset( $_GET[ 'end_date' ] ) && sanitize_text_field( wp_unslash( $_GET[ 'end_date' ] ) ) != '' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         $end = sanitize_text_field( wp_unslash( $_GET[ 'end_date' ] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                         $date_filter = true;
-                    } else {
-                        $end = gmdate( 'Y-m-d' );
                     }
 
                     if ( $date_filter ) {
                         if ( $searching != '' ) {
                             /* translators: %1$s is the formatted start date, %2$s is the formatted end date. */
                             $searching .= sprintf( __( 'between %1$s and %2$s.', 'gf-tools' ), 
-                                gmdate( $date_format, strtotime( $start ) ), 
-                                gmdate( $date_format, strtotime( $end ) ) 
+                                wp_date( $date_format, strtotime( $start ) ), 
+                                wp_date( $date_format, strtotime( $end ) ) 
                             );
                         } else {
                             /* translators: %1$s is the formatted start date, %2$s is the formatted end date. */
                             $searching = sprintf( __( 'Filtering between %1$s and %2$s.', 'gf-tools' ), 
-                                gmdate( $date_format, strtotime( $start ) ), 
-                                gmdate( $date_format, strtotime( $end ) ) 
+                                wp_date( $date_format, strtotime( $start ) ), 
+                                wp_date( $date_format, strtotime( $end ) ) 
                             );
                         }
                     }
@@ -592,7 +592,7 @@ class GF_Advanced_Tools_Shortcodes {
                                                     if ( $form_id == 0 ) {
                                                         $value = sanitize_text_field( $selected_form[ $field_id ] );
                                                         if ( $field_id == 'date_created' ) {
-                                                            $value = gmdate( $date_format, strtotime( $value ) );
+                                                            $value = wp_date( $date_format, strtotime( $value ) ) . ' TEST';
                                                         }
 
                                                     } else {
@@ -1431,6 +1431,7 @@ class GF_Advanced_Tools_Shortcodes {
             'page_size' => 500,
             'sort'      => false,
             'title'     => '',
+            'row'       => '',
         ], $atts );
 
         $form_id   = absint( $atts[ 'form_id' ] );
@@ -1439,12 +1440,13 @@ class GF_Advanced_Tools_Shortcodes {
         $page_size = absint( $atts[ 'page_size' ] );
         $sort      = strtoupper( sanitize_text_field( $atts[ 'sort' ] ) );
         $title     = sanitize_text_field( $atts[ 'title' ] );
+        $row       = sanitize_text_field( $atts[ 'row' ] );
 
         if ( ! $form_id || ! $field_id ) return __( 'Invalid Form or Field ID.', 'gf-tools' );
 
         // 1. Define a unique cache key for this specific data set
         // We include field_id and sort because they change the final $data array.
-        $cache_key = "gfat_data_{$form_id}_{$field_id}_{$page_size}_{$sort}";
+        $cache_key = "gfat_data_{$form_id}_{$field_id}_{$page_size}_{$sort}_{$row}";
         $data = get_transient( $cache_key );
 
         // 2. If cache is empty, run the processing logic
@@ -1468,10 +1470,43 @@ class GF_Advanced_Tools_Shortcodes {
 
             $counts = [];
             $field  = RGFormsModel::get_field( $form, $field_id );
+
             $ignore_labels = [ '-- select one --', 'select one', '-- select --', 'please select' ];
             $is_checkbox = ( $field && $field->get_input_type() === 'checkbox' );
+            $is_likert = ( $field && $field->type === 'survey' && isset( $field->inputType ) && $field->inputType === 'likert' );
 
-            if ( $field && ! empty( $field->choices ) ) {
+            if ( $is_likert ) {
+                if ( empty( $row ) ) return __( 'Please specify a row param for likert fields.', 'gf-tools' );
+
+                $matched_input = null;
+                foreach ( $field->inputs as $input ) {
+                    if ( $input[ 'label' ] === $row ) {
+                        $matched_input = $input;
+                        break;
+                    }
+                }
+
+                if ( ! $matched_input ) return __( 'Row not found in likert field.', 'gf-tools' );
+
+                foreach ( $field->choices as $choice ) {
+                    $counts[ $choice[ 'text' ] ] = 0;
+                }
+
+                $input_id = (string) $matched_input[ 'id' ];
+
+                foreach ( $entries as $entry ) {
+                    $hashed_val = isset( $entry[ $input_id ] ) ? $entry[ $input_id ] : '';
+                    if ( $hashed_val === '' ) continue;
+                    $col_hash = strstr( $hashed_val, ':' ) ? explode( ':', $hashed_val )[ 1 ] : $hashed_val;
+                    foreach ( $field->choices as $choice ) {
+                        if ( $choice[ 'value' ] === $col_hash ) {
+                            $counts[ $choice[ 'text' ] ]++;
+                            break;
+                        }
+                    }
+                }
+
+            } elseif ( $field && ! empty( $field->choices ) ) {
                 foreach ( $field->choices as $choice ) {
                     $text = trim( $choice[ 'text' ] );
                     if ( in_array( strtolower( $text ), $ignore_labels ) ) continue;
@@ -1479,20 +1514,22 @@ class GF_Advanced_Tools_Shortcodes {
                 }
             }
 
-            foreach ( $entries as $entry ) {
-                if ( $is_checkbox ) {
-                    foreach ( $field->inputs as $input ) {
-                        $val = isset( $entry[ (string) $input[ 'id' ] ] ) ? trim( $entry[ (string) $input[ 'id' ] ] ) : '';
-                        if ( $val !== '' && isset( $counts[ $val ] ) ) {
-                            $counts[ $val ]++;
+            if ( ! $is_likert ) {
+                foreach ( $entries as $entry ) {
+                    if ( $is_checkbox ) {
+                        foreach ( $field->inputs as $input ) {
+                            $val = isset( $entry[ (string) $input[ 'id' ] ] ) ? trim( $entry[ (string) $input[ 'id' ] ] ) : '';
+                            if ( $val !== '' && isset( $counts[ $val ] ) ) {
+                                $counts[ $val ]++;
+                            }
                         }
+                    } else {
+                        $val = isset( $entry[ $field_id ] ) ? trim( $entry[ $field_id ] ) : '';
+                        if ( $val === '' ) continue;
+                        $label = $field ? $field->get_value_export( $entry, $field_id ) : $val;
+                        if ( in_array( strtolower( $label ), $ignore_labels ) ) continue;
+                        if ( isset( $counts[ $label ] ) ) $counts[ $label ]++;
                     }
-                } else {
-                    $val = isset( $entry[ $field_id ] ) ? trim( $entry[ $field_id ] ) : '';
-                    if ( $val === '' ) continue;
-                    $label = $field ? $field->get_value_export( $entry, $field_id ) : $val;
-                    if ( in_array( strtolower( $label ), $ignore_labels ) ) continue;
-                    if ( isset( $counts[ $label ] ) ) $counts[ $label ]++;
                 }
             }
 

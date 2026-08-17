@@ -3,8 +3,8 @@ Contributors: apos37
 Tags: report, spam, merge tags, search, schedule
 Requires at least: 6.0
 Requires PHP: 7.4
-Tested up to: 7.0
-Stable tag: 1.1.6
+Tested up to: 7.1
+Stable tag: 1.1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -103,6 +103,14 @@ We recommend using our [website support forum](https://pluginrx.com/support/plug
 10. Entry Debugging
 
 == Changelog ==
+= 1.1.7 =
+* Fix: Consent field cross-contamination in entry modal where unchecked fields displayed text from a previously iterated consent field
+* Fix: Deprecated GFCommon::get_lead_field_display() calls passing entry ID instead of entry array as third parameter, resolving warnings introduced in GF 2.9.29
+* Tweak: Added support for survey likert fields inside report modals
+* Tweak: Added row parameter to [gfat_graph] shortcode to support graphing individual rows of multi-row likert survey fields, matching column choices by extracting the column hash from the stored rowHash:colHash entry value
+* Update: Added a "Create an Account" link to the bottom links on the login form if a login form has been selected and registrations are enabled site-wide
+* Fix: Login form not logging in when confirmation hook provided
+
 = 1.1.6 =
 * Compatibility: Increased minimum required WordPress version to 6.0
 * Compatibility: Tested with WordPress 7.0
