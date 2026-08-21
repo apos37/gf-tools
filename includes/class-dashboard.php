@@ -1419,6 +1419,200 @@ class GF_Advanced_Tools_Dashboard {
 
 
     /**
+     * Notification Search — Quickly search form notifications by subject, content, and to field
+     *
+     * @return void
+     */
+    public function notification_search() {
+        // Get forms first
+        $forms = GFAPI::get_forms();
+        if ( empty( $forms ) ) {
+            echo esc_html__( 'No forms found.', 'gf-tools' );
+            return;
+        }
+
+        // Current tab
+        $current_tab = $this->get_current_tab();
+
+        // Verify nonce
+        $nonce_verified = isset( $_REQUEST[ '_wpnonce' ] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST[ '_wpnonce' ] ) ), $this->nonce );
+
+        // What are we searching for
+        if ( $nonce_verified && isset( $_GET[ 'search' ] ) && sanitize_text_field( wp_unslash( $_GET[ 'search' ] ) ) != '' ) {
+            $search = sanitize_text_field( wp_unslash( $_GET[ 'search' ] ) );
+            $searching = true;
+        } else {
+            $search = '';
+            $searching = false;
+        }
+
+        // Add instructions
+        echo '<h2>'.esc_html__( 'Search Form Notifications:', 'gf-tools' ).'</h2>';
+
+        // The form with results
+        ?>
+        <div class="gfat-<?php echo esc_attr( $current_tab ); ?> gform-settings-panel__content">
+            <form id="gfat-<?php echo esc_attr( $current_tab ); ?>-form" method="GET" action="<?php echo esc_url( admin_url( 'admin.php' ) ); ?>">
+                <input type="hidden" name="page" value="<?php echo esc_attr( GFADVTOOLS_TEXTDOMAIN ); ?>">
+                <input type="hidden" name="tab" value="<?php echo esc_attr( $current_tab ); ?>">
+                <?php wp_nonce_field( $this->nonce, '_wpnonce', false ); ?>
+                <label for="gfat-<?php echo esc_attr( $current_tab ); ?>-search"><?php echo esc_html__( 'Enter Keyword(s)', 'gf-tools' ); ?>:</label>
+                <input type="text" name="search" id="gfat-<?php echo esc_attr( $current_tab ); ?>-search" value="<?php echo esc_attr( $search ); ?>">
+                <input type="submit" value="<?php echo esc_html__( 'Search', 'gf-tools' ); ?>" id="gfat-<?php echo esc_attr( $current_tab ); ?>-search-button" class="button button-primary"/>
+            </form>
+        </div>
+        <br>
+        <?php
+        // Stop if we are not searching
+        if ( !$searching ) {
+            return;
+        }
+
+        // Verify nonce
+        if ( !$nonce_verified ) {
+            die( esc_html__( 'Nonce could not be verified.', 'gf-tools' ) );
+        }
+
+        // Define list table columns
+        $columns = [
+            'name'       => __( 'Notification Name', 'gf-tools' ),
+            'context'    => __( 'Result Context', 'gf-tools' ),
+            'subject'    => __( 'Subject', 'gf-tools' ),
+            'form_title' => __( 'Form Name', 'gf-tools' ),
+        ];
+
+        // Set up pagination
+        $paged = isset( $_GET[ 'paged' ] ) ? max( 1, intval( wp_unslash( $_GET[ 'paged' ] ) ) ) : 1;
+        $per_page = isset( $_GET[ 'per_page' ] ) ? intval( wp_unslash( $_GET[ 'per_page' ] ) ) : get_option( 'gfadvtools_per_page', 25 );
+
+        // Cache key for results
+        $search_cache_key = 'gf_notification_search_'.md5( $search );
+        $data = wp_cache_get( $search_cache_key );
+
+        if ( false === $data ) {
+            $data = [];
+
+            foreach ( $forms as $form ) {
+                if ( empty( $form[ 'notifications' ] ) ) {
+                    continue;
+                }
+
+                $form_id = absint( $form[ 'id' ] );
+                $form_title = sanitize_text_field( $form[ 'title' ] );
+
+                foreach ( $form[ 'notifications' ] as $notification ) {
+                    $subject = isset( $notification[ 'subject' ] ) ? $notification[ 'subject' ] : '';
+                    $message = isset( $notification[ 'message' ] ) ? $notification[ 'message' ] : '';
+                    $to = $this->get_notification_to_string( $notification );
+
+                    $match_value = '';
+                    if ( stripos( $subject, $search ) !== false ) {
+                        $match_value = $subject;
+                    } elseif ( stripos( $message, $search ) !== false ) {
+                        $match_value = $message;
+                    } elseif ( stripos( $to, $search ) !== false ) {
+                        $match_value = $to;
+                    } else {
+                        continue;
+                    }
+
+                    $notification_id = isset( $notification[ 'id' ] ) ? $notification[ 'id' ] : '';
+                    $notification_name = isset( $notification[ 'name' ] ) && $notification[ 'name' ] != '' ? $notification[ 'name' ] : __( '(unnamed)', 'gf-tools' );
+
+                    $edit_link = add_query_arg( [
+                        'page'    => 'gf_edit_forms',
+                        'view'    => 'settings',
+                        'subview' => 'notification',
+                        'id'      => $form_id,
+                        'nid'     => $notification_id,
+                    ], admin_url( 'admin.php' ) );
+
+                    $data[] = [
+                        'link'       => $edit_link,
+                        'name'       => sanitize_text_field( $notification_name ),
+                        'context'    => $this->get_search_context( $match_value, $search ),
+                        'subject'    => sanitize_text_field( $subject ),
+                        'form_title' => $form_title,
+                    ];
+                } // End foreach notification
+            } // End foreach form
+
+            wp_cache_set( $search_cache_key, $data );
+        }
+
+        $total_rows = count( $data );
+        $offset = ( $paged - 1 ) * $per_page;
+        $data = array_slice( $data, $offset, $per_page );
+
+        // Show the table
+        $qs = [
+            'search' => $search,
+        ];
+        $this->wp_list_table( $columns, $data, $current_tab, $qs, $total_rows );
+    } // End notification_search()
+
+
+    /**
+     * Flatten a notification's "to" address, including routing rule values, into a searchable string
+     *
+     * @param array $notification
+     * @return string
+     */
+    private function get_notification_to_string( $notification ) {
+        $parts = [];
+
+        if ( !empty( $notification[ 'to' ] ) && is_string( $notification[ 'to' ] ) ) {
+            $parts[] = $notification[ 'to' ];
+        }
+
+        if ( !empty( $notification[ 'routing' ] ) && is_array( $notification[ 'routing' ] ) ) {
+            foreach ( $notification[ 'routing' ] as $rule ) {
+                if ( !empty( $rule[ 'value' ] ) ) {
+                    $parts[] = $rule[ 'value' ];
+                }
+            }
+        }
+
+        return implode( ', ', $parts );
+    } // End get_notification_to_string()
+
+
+    /**
+     * Build a highlighted snippet of text around the matched keyword
+     *
+     * @param string $text
+     * @param string $search
+     * @param int $length
+     * @return string
+     */
+    private function get_search_context( $text, $search, $length = 80 ) {
+        $text = wp_strip_all_tags( $text );
+        $pos = stripos( $text, $search );
+
+        if ( $pos === false ) {
+            return esc_html( mb_substr( $text, 0, $length ) );
+        }
+
+        $start = max( 0, $pos - floor( $length / 2 ) );
+        $snippet = mb_substr( $text, $start, $length );
+
+        if ( $start > 0 ) {
+            $snippet = '…'.$snippet;
+        }
+        if ( ( $start + $length ) < mb_strlen( $text ) ) {
+            $snippet = $snippet.'…';
+        }
+
+        $escaped = esc_html( $snippet );
+        $pattern = '/'.preg_quote( esc_html( $search ), '/' ).'/i';
+
+        return preg_replace_callback( $pattern, function( $matches ) {
+            return '<mark>'.$matches[ 0 ].'</mark>';
+        }, $escaped );
+    } // End get_search_context()
+
+
+    /**
      * Front-End Reports
      *
      * @return void
@@ -2642,6 +2836,7 @@ class GF_Advanced_Tools_Dashboard {
     /**
      * Reference page sidebar
      *
+     * @param array $data
      * @return void
      */
     public function reference_sidebar( $data ) {

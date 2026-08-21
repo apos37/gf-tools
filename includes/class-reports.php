@@ -1246,6 +1246,12 @@ class GF_Advanced_Tools_Reports {
                 continue;
             }
 
+            $field = apply_filters( 'gfadvtools_report_modal_field', $field, $report_id, $form_id, $entry_id );
+
+            if ( ! $field ) {
+                continue;
+            }
+
             $value = '';
 
             // Name fields

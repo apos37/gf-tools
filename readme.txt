@@ -4,7 +4,7 @@ Tags: report, spam, merge tags, search, schedule
 Requires at least: 6.0
 Requires PHP: 7.4
 Tested up to: 7.1
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -104,6 +104,10 @@ We recommend using our [website support forum](https://pluginrx.com/support/plug
 10. Entry Debugging
 
 == Changelog ==
+= 1.3.0 =
+* Update: Added Notification Search under Forms > Advanced Tools > Notification Search. Quickly find which form a received email came from by searching notification subject, content, and to fields, with results linking directly to the notification's edit screen.
+* Tweak: Added `gfadvtools_report_modal_field` filter to allow hiding or modifying individual fields in the front-end report entry modal.
+
 = 1.2.0 =
 * Update: Added our own Gravity Forms Error Log viewer under Forms > Advanced Tools > Logs. Captures core and add-on log messages independent of Gravity Forms' own logging settings, with search, filtering by source and form, keyword exclusion (both at capture time and in the log view), and automatic cleanup after a configurable number of days.
 * Update: Added an optional setting to log validation failures for troubleshooting silent submission failures (e.g. reCAPTCHA or custom validation hooks that don't return a message).

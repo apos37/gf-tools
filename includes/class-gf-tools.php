@@ -232,17 +232,18 @@ class GF_Advanced_Tools extends GFAddOn {
 
         // The tabs
         $tabs = [
-            'global_search'   => [ 'label' => 'Global Search' ],
-            'user_entries'    => [ 'label' => 'User Entries' ],
-            'jump_to_entry'   => [ 'label' => 'Jump to Entry' ],
-            'entries_by_date' => [ 'label' => 'Entries by Date' ],
-            'recent'          => [ 'label' => 'Recent Entries' ],
-            'spam_entries'    => [ 'label' => 'Spam Entries' ],
-            'spam_list'       => [ 'label' => 'Spam List', 'plugin_setting' => 'spam_filtering' ],
-            'reports'         => [ 'label' => 'Front-End Reports' ],
-            'shortcodes'      => [ 'label' => 'Shortcodes' ],
-            'merge_tags'      => [ 'label' => 'Merge Tags' ],
-            'pre_populate'    => [ 'label' => 'Pre-Populate Fields' ],
+            'global_search'       => [ 'label' => 'Global Search' ],
+            'user_entries'        => [ 'label' => 'User Entries' ],
+            'jump_to_entry'       => [ 'label' => 'Jump to Entry' ],
+            'entries_by_date'     => [ 'label' => 'Entries by Date' ],
+            'recent'              => [ 'label' => 'Recent Entries' ],
+            'spam_entries'        => [ 'label' => 'Spam Entries' ],
+            'spam_list'           => [ 'label' => 'Spam List', 'plugin_setting' => 'spam_filtering' ],
+            'notification_search' => [ 'label' => 'Notification Search' ],
+            'reports'             => [ 'label' => 'Front-End Reports' ],
+            'shortcodes'          => [ 'label' => 'Shortcodes' ],
+            'merge_tags'          => [ 'label' => 'Merge Tags' ],
+            'pre_populate'        => [ 'label' => 'Pre-Populate Fields' ],
         ];
 
         if ( is_plugin_active( 'forgravity-fillablepdfs/fillablepdfs.php' ) ) {
